@@ -1,0 +1,37 @@
+{
+  "name": "sikkim-yatra-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sikkim Yatra - Smart Offline-First Digital Tourism Platform for Sikkim",
+  "packageManager": "npm@11.7.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:web": "turbo run dev --filter=@sikkim-yatra/web",
+    "dev:server": "turbo run dev --filter=@sikkim-yatra/server",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "clean": "turbo run clean && rimraf node_modules",
+    "db:generate": "npm run db:generate --workspace=@sikkim-yatra/server",
+    "db:push": "npm run db:push --workspace=@sikkim-yatra/server",
+    "db:studio": "npm run db:studio --workspace=@sikkim-yatra/server",
+    "db:seed": "npm run db:seed --workspace=@sikkim-yatra/server"
+  },
+  "devDependencies": {
+    "eslint": "^9.20.0",
+    "prettier": "^3.5.1",
+    "turbo": "^2.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.68.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

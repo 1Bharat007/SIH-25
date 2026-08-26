@@ -1,0 +1,10 @@
+node_modules
+.next
+dist
+build
+.turbo
+coverage
+package-lock.json
+public/sw.js
+public/workbox-*
+prisma/*.db

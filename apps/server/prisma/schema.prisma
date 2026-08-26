@@ -1,0 +1,332 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -----------------------------------------------------------------------------
+// ENUMS
+// -----------------------------------------------------------------------------
+
+enum Role {
+  TOURIST
+  VENDOR
+  ADMIN
+}
+
+enum District {
+  GANGTOK
+  MANGAN
+  NAMCHI
+  GYALSHING
+  PAKYONG
+  SORENG
+}
+
+enum PlaceCategory {
+  MONASTERY
+  CULTURAL_HERITAGE
+  HIGH_ALTITUDE_LAKE
+  TREKKING_TRAIL
+  WATERFALL
+  VIEWPOINT
+  WILDLIFE_SANCTUARY
+  TOWN
+}
+
+enum VendorType {
+  HOMESTAY
+  RESTAURANT_CAFE
+  TAXI_DRIVER
+  HANDICRAFT_STORE
+  TREKKING_GUIDE
+  EQUIPMENT_RENTAL
+}
+
+enum EmergencyType {
+  POLICE_STATION
+  HOSPITAL
+  TOURIST_HELPLINE
+  DISASTER_MANAGEMENT_SDMA
+  MOUNTAIN_RESCUE
+  FOREST_CHECKPOST
+}
+
+enum AlertType {
+  LANDSLIDE
+  FLASH_FLOOD
+  EARTHQUAKE
+  ROAD_CLOSURE
+  HEAVY_SNOWFALL
+  WEATHER_WARNING
+  GENERAL_ADVISORY
+}
+
+enum AlertSeverity {
+  INFO
+  MODERATE
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  RESOLVED
+  EXPIRED
+}
+
+enum SOSStatus {
+  PENDING
+  ACKNOWLEDGED
+  DISPATCHED
+  RESOLVED
+  FALSE_ALARM
+}
+
+// -----------------------------------------------------------------------------
+// AUTHENTICATION & USERS (NextAuth.js Adapter Compatible)
+// -----------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  image         String?
+  phone         String?
+  role          Role      @default(TOURIST)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Domain relations
+  vendorProfile       Vendor?
+  sosRequests         SOSRequest[]        @relation("UserSOSRequests")
+  resolvedSosRequests SOSRequest[]        @relation("ResolvedByStaff")
+  reviews             Review[]
+  alertsCreated       Alert[]             @relation("AlertsCreatedBy")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// -----------------------------------------------------------------------------
+// TOURISM & ATTRACTIONS
+// -----------------------------------------------------------------------------
+
+model Place {
+  id               String        @id @default(uuid())
+  slug             String        @unique
+  name             String
+  localName        String?       // Tibetan / Nepali script or local Sikkimese pronunciation
+  district         District
+  category         PlaceCategory
+  description      String        @db.Text
+  history          String?       @db.Text
+  altitudeMeters   Int?
+  latitude         Float
+  longitude        Float
+  rating           Float         @default(0.0)
+  reviewCount      Int           @default(0)
+  thumbnailUrl     String
+  images           String[]
+  permitRequired   Boolean       @default(false)
+  permitType       String?       // e.g. "Protected Area Permit (PAP)", "Inner Line Permit (ILP)"
+  bestTimeToVisit  String?       // e.g. "March to May, October to December"
+  openingHours     String?
+  entryFee         String?
+  offlineAvailable Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relations
+  vendors           Vendor[]
+  emergencyContacts EmergencyContact[]
+  reviews           Review[]
+  alerts            Alert[]
+
+  @@index([district])
+  @@index([category])
+  @@index([latitude, longitude])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?  @db.Text
+  userId    String
+  placeId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@index([placeId])
+  @@index([userId])
+}
+
+// -----------------------------------------------------------------------------
+// LOCAL VENDORS & SERVICES
+// -----------------------------------------------------------------------------
+
+model Vendor {
+  id           String     @id @default(uuid())
+  businessName String
+  ownerName    String
+  type         VendorType
+  description  String?    @db.Text
+  phone        String
+  whatsapp     String?
+  email        String?
+  address      String
+  district     District
+  latitude     Float?
+  longitude    Float?
+  isVerified   Boolean    @default(false)
+  pricingInfo  String?
+  images       String[]
+  rating       Float      @default(0.0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  placeId String?
+  place   Place?  @relation(fields: [placeId], references: [id], onDelete: SetNull)
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([district])
+  @@index([type])
+  @@index([placeId])
+}
+
+// -----------------------------------------------------------------------------
+// EMERGENCY CONTACTS & HELPLINES
+// -----------------------------------------------------------------------------
+
+model EmergencyContact {
+  id          String        @id @default(uuid())
+  name        String
+  type        EmergencyType
+  phone       String
+  altPhone    String?
+  address     String
+  district    District
+  latitude    Float
+  longitude   Float
+  is24x7      Boolean       @default(true)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  placeId String?
+  place   Place?  @relation(fields: [placeId], references: [id], onDelete: SetNull)
+
+  @@index([district])
+  @@index([type])
+}
+
+// -----------------------------------------------------------------------------
+// DISASTER / HAZARD ALERTS (Landslides, Road Closures, Weather)
+// -----------------------------------------------------------------------------
+
+model Alert {
+  id          String        @id @default(uuid())
+  title       String
+  description String        @db.Text
+  type        AlertType
+  severity    AlertSeverity
+  status      AlertStatus   @default(ACTIVE)
+  district    District
+  centerLat   Float
+  centerLng   Float
+  radiusKm    Float?
+  geoPolygon  Json?
+  startsAt    DateTime      @default(now())
+  expiresAt   DateTime?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  placeId     String?
+  place       Place?  @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  createdById String?
+  createdBy   User?   @relation("AlertsCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([district])
+  @@index([status])
+  @@index([severity])
+}
+
+// -----------------------------------------------------------------------------
+// EMERGENCY SOS REQUESTS
+// -----------------------------------------------------------------------------
+
+model SOSRequest {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation("UserSOSRequests", fields: [userId], references: [id], onDelete: Cascade)
+  latitude        Float
+  longitude       Float
+  altitudeMeters  Float?
+  accuracyMeters  Float?
+  batteryLevel    Int?
+  emergencyType   String?
+  notes           String?   @db.Text
+  status          SOSStatus @default(PENDING)
+  resolvedById    String?
+  resolvedBy      User?     @relation("ResolvedByStaff", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolutionNotes String?   @db.Text
+  createdAt       DateTime  @default(now())
+  resolvedAt      DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
