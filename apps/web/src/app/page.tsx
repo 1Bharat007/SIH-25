@@ -68,7 +68,7 @@ export default function HomePage() {
                   Sikkim Yatra
                 </h1>
                 <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
-                  v0.2.0 Core Map
+                  v0.3.0 Safety & SOS
                 </span>
               </div>
               <p className="text-xs text-emerald-300/80 sm:text-sm">
@@ -79,6 +79,14 @@ export default function HomePage() {
 
           {/* Navigation Links & Network / PWA Status Pills */}
           <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/safety"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-950/40 px-3.5 py-1.5 text-xs font-bold text-rose-300 shadow-md hover:bg-rose-900/50 transition-all"
+            >
+              <Shield className="h-3.5 w-3.5 text-rose-400" />
+              <span>Safety & SOS</span>
+            </Link>
+
             <Link
               href="/explore"
               className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-3.5 py-1.5 text-xs font-bold text-slate-950 shadow-md hover:from-emerald-400 hover:to-teal-500 transition-all"
@@ -118,7 +126,7 @@ export default function HomePage() {
         <section className="mt-8 text-center sm:mt-12">
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/50 px-4 py-1.5 text-xs font-medium text-emerald-200 backdrop-blur-md mb-4 shadow-sm">
             <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
-            <span>Interactive Map & Discovery Experience Active</span>
+            <span>Interactive Map & Safety Center Active</span>
           </div>
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
             Discover the Hidden Jewel of the{' '}
@@ -137,7 +145,15 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 px-6 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-emerald-950/50 hover:opacity-95 transition-all group"
             >
               <Navigation className="h-4 w-4 fill-current group-hover:translate-x-0.5 transition-transform" />
-              <span>Launch Interactive Map & Discovery</span>
+              <span>Launch Interactive Map</span>
+            </Link>
+
+            <Link
+              href="/safety"
+              className="inline-flex items-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-950/40 px-5 py-3 text-sm font-bold text-rose-300 hover:bg-rose-900/50 transition-all group"
+            >
+              <Shield className="h-4 w-4 text-rose-400" />
+              <span>Traveler Safety & SOS Center</span>
             </Link>
 
             <button
