@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Providers } from './providers';
 import FloatingSOSButton from '../components/safety/FloatingSOSButton';
+import RealtimeAlertBanner from '../components/disaster/RealtimeAlertBanner';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark">
       <body className="min-h-screen bg-[#031e1a] text-[#f0fdf9] antialiased selection:bg-[#0fb49a] selection:text-[#022c22]">
         <Providers>
+          <RealtimeAlertBanner />
           {children}
           <FloatingSOSButton />
         </Providers>
@@ -43,3 +45,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

@@ -85,9 +85,14 @@ export interface HazardAlertSummary {
   centerLat: number;
   centerLng: number;
   radiusKm?: number;
+  affectedCorridor?: string;
+  alternateRouteId?: string;
+  recommendedAction?: string;
+  sourceAuthority?: string;
   startsAt: string;
   expiresAt?: string;
   placeId?: string;
+  geoPolygon?: [number, number][];
 }
 
 export interface PlaceSummary {

@@ -3,6 +3,7 @@ import { ENV } from './config/env.js';
 import { corsMiddleware } from './middleware/cors.middleware.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 import { apiRoutes } from './routes/index.js';
+import { initDisasterWebSocketServer } from './utils/disaster-ws.js';
 
 const app = express();
 
@@ -43,6 +44,8 @@ app.use(errorMiddleware);
 const server = app.listen(ENV.PORT, () => {
   console.log(`🏔️ Sikkim Yatra Server running on http://localhost:${ENV.PORT}`);
   console.log(`🩺 Health check available at http://localhost:${ENV.PORT}${ENV.API_PREFIX}/health`);
+  initDisasterWebSocketServer(server);
 });
 
 export { app, server };
+

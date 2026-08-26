@@ -80,6 +80,14 @@ export default function HomePage() {
           {/* Navigation Links & Network / PWA Status Pills */}
           <div className="flex flex-wrap items-center gap-2.5">
             <Link
+              href="/disaster"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-red-500/40 bg-red-950/40 px-3.5 py-1.5 text-xs font-bold text-red-300 shadow-md hover:bg-red-900/50 transition-all"
+            >
+              <AlertTriangle className="h-3.5 w-3.5 text-red-400 animate-pulse" />
+              <span>Disaster Center</span>
+            </Link>
+
+            <Link
               href="/safety"
               className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-950/40 px-3.5 py-1.5 text-xs font-bold text-rose-300 shadow-md hover:bg-rose-900/50 transition-all"
             >
