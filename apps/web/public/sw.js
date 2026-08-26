@@ -13,23 +13,23 @@ const STATIC_PRECACHE_URLS = [
 ];
 
 // Install Event - Precache critical shell assets
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(
     caches
       .open(CACHE_STATIC_NAME)
-      .then((cache) => cache.addAll(STATIC_PRECACHE_URLS))
+      .then(cache => cache.addAll(STATIC_PRECACHE_URLS))
       .then(() => self.skipWaiting())
   );
 });
 
 // Activate Event - Clean up stale cache versions
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
     caches
       .keys()
-      .then((cacheNames) =>
+      .then(cacheNames =>
         Promise.all(
-          cacheNames.map((name) => {
+          cacheNames.map(name => {
             if (name !== CACHE_STATIC_NAME && name !== CACHE_API_NAME) {
               return caches.delete(name);
             }
@@ -41,7 +41,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch Event - Dynamic caching strategy
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
 
@@ -54,10 +54,10 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.includes('/api/')) {
     event.respondWith(
       fetch(request)
-        .then((networkResponse) => {
+        .then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
-            caches.open(CACHE_API_NAME).then((cache) => cache.put(request, responseClone));
+            caches.open(CACHE_API_NAME).then(cache => cache.put(request, responseClone));
           }
           return networkResponse;
         })
@@ -88,14 +88,14 @@ self.addEventListener('fetch', (event) => {
     url.pathname.startsWith('/_next/static/')
   ) {
     event.respondWith(
-      caches.match(request).then((cachedResponse) => {
+      caches.match(request).then(cachedResponse => {
         if (cachedResponse) {
           return cachedResponse;
         }
-        return fetch(request).then((networkResponse) => {
+        return fetch(request).then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
-            caches.open(CACHE_STATIC_NAME).then((cache) => cache.put(request, responseClone));
+            caches.open(CACHE_STATIC_NAME).then(cache => cache.put(request, responseClone));
           }
           return networkResponse;
         });
@@ -108,10 +108,10 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
-        .then((networkResponse) => {
+        .then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
-            caches.open(CACHE_STATIC_NAME).then((cache) => cache.put(request, responseClone));
+            caches.open(CACHE_STATIC_NAME).then(cache => cache.put(request, responseClone));
           }
           return networkResponse;
         })
@@ -128,13 +128,11 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Default fallback to fetch
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => cachedResponse || fetch(request))
-  );
+  event.respondWith(caches.match(request).then(cachedResponse => cachedResponse || fetch(request)));
 });
 
 // Message Event - Skip Waiting on update prompt
-self.addEventListener('message', (event) => {
+self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }

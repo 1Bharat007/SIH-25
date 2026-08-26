@@ -1,20 +1,19 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   Mountain,
   Wifi,
   WifiOff,
   Server,
   Database,
-  Layers,
   Sparkles,
   RefreshCw,
   CheckCircle2,
   AlertTriangle,
   Cpu,
   Smartphone,
-  ShieldCheck,
   Compass,
   ArrowUpRight,
   Lock,
@@ -22,15 +21,20 @@ import {
   Store,
   Shield,
   LogOut,
+  Map as MapIcon,
+  Navigation,
+  ArrowRight,
 } from 'lucide-react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useHealthCheck } from '../hooks/useHealthCheck';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import { usePlacesQuery } from '../hooks/useTourism';
 
 export default function HomePage() {
   const { data: health, isLoading, isError, error, refetch, isFetching } = useHealthCheck();
   const { isOnline } = useOnlineStatus();
   const { data: session, status: authStatus } = useSession();
+  const { data: previewPlaces = [] } = usePlacesQuery();
 
   const handleQuickLogin = (email: string) => {
     signIn('credentials', {
@@ -64,7 +68,7 @@ export default function HomePage() {
                   Sikkim Yatra
                 </h1>
                 <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
-                  v0.1.0 Scaffold
+                  v0.2.0 Core Map
                 </span>
               </div>
               <p className="text-xs text-emerald-300/80 sm:text-sm">
@@ -73,8 +77,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Network & PWA Status Pills */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Navigation Links & Network / PWA Status Pills */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-3.5 py-1.5 text-xs font-bold text-slate-950 shadow-md hover:from-emerald-400 hover:to-teal-500 transition-all"
+            >
+              <MapIcon className="h-3.5 w-3.5" />
+              <span>Explore Map</span>
+            </Link>
+
             <div
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-md transition-all ${
                 isOnline
@@ -106,22 +118,103 @@ export default function HomePage() {
         <section className="mt-8 text-center sm:mt-12">
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/50 px-4 py-1.5 text-xs font-medium text-emerald-200 backdrop-blur-md mb-4 shadow-sm">
             <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
-            <span>Full-Stack Auth & Schema Scaffold Active</span>
+            <span>Interactive Map & Discovery Experience Active</span>
           </div>
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Gateway to the{' '}
+            Discover the Hidden Jewel of the{' '}
             <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
               Himalayas
             </span>
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-emerald-200/80 sm:text-base">
-            Engineered with NextAuth role-based authentication, offline caching, Express REST API,
-            PostgreSQL Prisma ORM, and comprehensive Sikkim tourism schema.
+            Explore sacred monasteries, high-altitude alpine lakes, verified local homestays, 24x7
+            emergency helplines, and active disaster advisories across Sikkim’s 6 districts.
           </p>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 px-6 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-emerald-950/50 hover:opacity-95 transition-all group"
+            >
+              <Navigation className="h-4 w-4 fill-current group-hover:translate-x-0.5 transition-transform" />
+              <span>Launch Interactive Map & Discovery</span>
+            </Link>
+
+            <button
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-slate-900/60 px-5 py-3 text-sm font-semibold text-emerald-200 hover:bg-slate-900 transition-all"
+            >
+              <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <span>{isFetching ? 'Pinging API...' : 'Ping Full-Stack'}</span>
+            </button>
+          </div>
+        </section>
+
+        {/* Featured Destinations Preview Carousel */}
+        <section className="mt-12">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Compass className="h-5 w-5 text-emerald-400" />
+                <span>Featured Destinations in Sikkim</span>
+              </h3>
+              <p className="text-xs text-emerald-300/70">
+                Click any destination to view cultural lore, verified homestays & directions
+              </p>
+            </div>
+
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-300 hover:text-emerald-200"
+            >
+              <span>View All on Map</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {previewPlaces.slice(0, 3).map(place => (
+              <Link
+                key={place.id}
+                href={`/places/${place.slug}`}
+                className="group overflow-hidden rounded-3xl border border-emerald-500/20 bg-slate-900/60 shadow-xl backdrop-blur-md transition-all hover:border-emerald-500/60 hover:shadow-2xl"
+              >
+                <div className="relative h-44 w-full overflow-hidden bg-slate-950">
+                  <img
+                    src={place.thumbnailUrl}
+                    alt={place.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+                  <div className="absolute top-3 left-3 rounded-full bg-black/60 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300 backdrop-blur-md">
+                    {place.district}
+                  </div>
+                  {place.altitudeMeters && (
+                    <div className="absolute top-3 right-3 rounded-full bg-black/70 px-2.5 py-0.5 text-[11px] font-bold text-amber-300 backdrop-blur-md">
+                      {place.altitudeMeters}m
+                    </div>
+                  )}
+                  <div className="absolute bottom-2.5 left-3 text-xs font-bold text-amber-400">
+                    ★ {place.rating.toFixed(1)}
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <h4 className="font-bold text-white group-hover:text-emerald-300 transition-colors">
+                    {place.name}
+                  </h4>
+                  <p className="mt-1 text-xs text-emerald-200/70 line-clamp-2">
+                    {place.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </section>
 
         {/* Authentication & Role Demo Card */}
-        <section className="mt-8">
+        <section className="mt-10">
           <div className="overflow-hidden rounded-3xl border border-emerald-500/20 bg-slate-900/60 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-emerald-900/40 pb-5">
               <div className="flex items-center gap-3">
@@ -193,10 +286,9 @@ export default function HomePage() {
                     Quick test login using seeded role credentials:
                   </p>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    {/* Tourist Login */}
                     <button
                       onClick={() => handleQuickLogin('tourist@sikkimyatra.com')}
-                      className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-950/30 p-4 text-left hover:bg-emerald-950/60 transition-all hover:border-emerald-500/60 group"
+                      className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-950/30 p-4 text-left hover:bg-emerald-950/60 transition-all group"
                     >
                       <div className="rounded-xl bg-emerald-500/20 p-2.5 text-emerald-400 group-hover:scale-105 transition-transform">
                         <User className="h-5 w-5" />
@@ -209,10 +301,9 @@ export default function HomePage() {
                       </div>
                     </button>
 
-                    {/* Vendor Login */}
                     <button
                       onClick={() => handleQuickLogin('vendor@sikkimyatra.com')}
-                      className="flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 text-left hover:bg-amber-950/40 transition-all hover:border-amber-500/60 group"
+                      className="flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-950/20 p-4 text-left hover:bg-amber-950/40 transition-all group"
                     >
                       <div className="rounded-xl bg-amber-500/20 p-2.5 text-amber-400 group-hover:scale-105 transition-transform">
                         <Store className="h-5 w-5" />
@@ -225,10 +316,9 @@ export default function HomePage() {
                       </div>
                     </button>
 
-                    {/* Admin Login */}
                     <button
                       onClick={() => handleQuickLogin('admin@sikkimyatra.com')}
-                      className="flex items-center gap-3 rounded-2xl border border-rose-500/30 bg-rose-950/20 p-4 text-left hover:bg-rose-950/40 transition-all hover:border-rose-500/60 group"
+                      className="flex items-center gap-3 rounded-2xl border border-rose-500/30 bg-rose-950/20 p-4 text-left hover:bg-rose-950/40 transition-all group"
                     >
                       <div className="rounded-xl bg-rose-500/20 p-2.5 text-rose-400 group-hover:scale-105 transition-transform">
                         <Shield className="h-5 w-5" />
@@ -247,7 +337,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Live Connectivity Card (Main User Requirement) */}
+        {/* Live Connectivity Card */}
         <section className="mt-8">
           <div className="overflow-hidden rounded-3xl border border-emerald-500/20 bg-slate-900/60 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-emerald-900/40 pb-5">
@@ -262,46 +352,30 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
-
-              <button
-                onClick={() => refetch()}
-                disabled={isFetching}
-                className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-200 transition-all hover:bg-emerald-500/20 hover:border-emerald-500/50 disabled:opacity-50"
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-                <span>{isFetching ? 'Pinging API...' : 'Ping API Now'}</span>
-              </button>
             </div>
 
-            {/* Health Content Render */}
             <div className="mt-6">
               {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
-                  <p className="mt-3 text-sm text-emerald-300/80">
-                    Connecting to Sikkim Yatra Backend API...
-                  </p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="h-7 w-7 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
+                  <p className="mt-2 text-xs text-emerald-300/80">Connecting to Backend API...</p>
                 </div>
               ) : isError ? (
-                <div className="rounded-2xl border border-amber-500/30 bg-amber-950/30 p-6 text-amber-200">
+                <div className="rounded-2xl border border-amber-500/30 bg-amber-950/30 p-5 text-amber-200">
                   <div className="flex items-start gap-3">
-                    <AlertTriangle className="h-6 w-6 text-amber-400 shrink-0 mt-0.5" />
+                    <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="font-semibold text-amber-300">Backend Server on Standby</h4>
+                      <h4 className="font-semibold text-amber-300 text-sm">
+                        Backend Server on Standby
+                      </h4>
                       <p className="mt-1 text-xs text-amber-200/80">
-                        {error?.message ||
-                          'Start Express server using `npm run dev:server` to view live telemetry.'}
+                        {error?.message || 'Start Express server using `npm run dev:server`.'}
                       </p>
-                      <div className="mt-3 rounded-lg bg-black/40 p-3 font-mono text-xs text-amber-300">
-                        Endpoint:{' '}
-                        {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/health
-                      </div>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {/* Status Box */}
                   <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-emerald-300/70">API Status</span>
@@ -313,7 +387,6 @@ export default function HomePage() {
                     <span className="text-[11px] text-emerald-400/80">{health?.service}</span>
                   </div>
 
-                  {/* Uptime Box */}
                   <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-emerald-300/70">Server Uptime</span>
@@ -327,12 +400,9 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  {/* Database Box */}
                   <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-emerald-300/70">
-                        PostgreSQL (Prisma)
-                      </span>
+                      <span className="text-xs font-medium text-emerald-300/70">PostgreSQL</span>
                       <Database className="h-4 w-4 text-sky-400" />
                     </div>
                     <p className="mt-2 text-2xl font-bold capitalize text-sky-300">
@@ -345,12 +415,9 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  {/* Timestamp Box */}
                   <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-emerald-300/70">
-                        Heartbeat Time
-                      </span>
+                      <span className="text-xs font-medium text-emerald-300/70">Heartbeat</span>
                       <Compass className="h-4 w-4 text-amber-400" />
                     </div>
                     <p className="mt-2 font-mono text-sm font-semibold text-amber-300">
@@ -370,96 +437,15 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Monorepo & Schema Overview */}
-        <section className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
-          {/* Card 1: Frontend */}
-          <div className="rounded-2xl border border-emerald-500/20 bg-slate-900/40 p-5 backdrop-blur-md">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-emerald-500/20 p-2 text-emerald-400">
-                <Layers className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-white">apps/web</h4>
-                <p className="text-[11px] text-emerald-300/70">Next.js 15 App Router</p>
-              </div>
-            </div>
-            <ul className="mt-4 space-y-1.5 text-xs text-emerald-200/80">
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                <span>NextAuth.js Credentials & Google OAuth</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                <span>TanStack React Query v5</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                <span>PWA Manifest + Service Worker</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Card 2: Backend */}
-          <div className="rounded-2xl border border-emerald-500/20 bg-slate-900/40 p-5 backdrop-blur-md">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-teal-500/20 p-2 text-teal-400">
-                <Server className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-white">apps/server</h4>
-                <p className="text-[11px] text-teal-300/70">Node.js Express API</p>
-              </div>
-            </div>
-            <ul className="mt-4 space-y-1.5 text-xs text-emerald-200/80">
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                <span>Prisma Client with PostgreSQL models</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                <span>Seed script with 6 Sikkim regions</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-teal-400 shrink-0" />
-                <span>Typed /api/v1/health status endpoint</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Card 3: Database & Models */}
-          <div className="rounded-2xl border border-emerald-500/20 bg-slate-900/40 p-5 backdrop-blur-md">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-amber-500/20 p-2 text-amber-400">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-white">Prisma Schema</h4>
-                <p className="text-[11px] text-amber-300/70">Core Entities</p>
-              </div>
-            </div>
-            <ul className="mt-4 space-y-1.5 text-xs text-emerald-200/80">
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                <span>User (TOURIST / VENDOR / ADMIN)</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                <span>Place, Vendor, EmergencyContact</span>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                <span>Disaster Alert & SOSRequest tracking</span>
-              </li>
-            </ul>
-          </div>
-        </section>
-
         {/* Footer */}
         <footer className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-emerald-900/40 py-6 text-center text-xs text-emerald-400/60 sm:flex-row sm:text-left">
           <p>© 2026 Sikkim Yatra — Offline-First Smart Digital Tourism Platform.</p>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1 text-emerald-300">
-              Turborepo Pipeline Active
+            <Link href="/explore" className="text-emerald-300 hover:underline">
+              Explore Interactive Map
+            </Link>
+            <span className="flex items-center gap-1 text-emerald-400">
+              Turborepo Active
               <ArrowUpRight className="h-3.5 w-3.5" />
             </span>
           </div>

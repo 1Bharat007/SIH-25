@@ -12,10 +12,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
     if ('serviceWorker' in navigator && process.env.NODE_ENV !== 'test') {
       navigator.serviceWorker
         .register('/sw.js')
-        .then((registration) => {
-          console.log('✅ Sikkim Yatra PWA ServiceWorker registered with scope:', registration.scope);
+        .then(registration => {
+          console.log(
+            '✅ Sikkim Yatra PWA ServiceWorker registered with scope:',
+            registration.scope
+          );
         })
-        .catch((error) => {
+        .catch(error => {
           console.warn('⚠️ ServiceWorker registration error:', error);
         });
     }
