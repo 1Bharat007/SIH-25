@@ -80,6 +80,14 @@ export default function HomePage() {
           {/* Navigation Links & Network / PWA Status Pills */}
           <div className="flex flex-wrap items-center gap-2.5">
             <Link
+              href="/culture"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-950/40 px-3.5 py-1.5 text-xs font-bold text-amber-300 shadow-md hover:bg-amber-900/50 transition-all"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+              <span>Cultural & AR Hub</span>
+            </Link>
+
+            <Link
               href="/disaster"
               className="inline-flex items-center gap-1.5 rounded-xl border border-red-500/40 bg-red-950/40 px-3.5 py-1.5 text-xs font-bold text-red-300 shadow-md hover:bg-red-900/50 transition-all"
             >
