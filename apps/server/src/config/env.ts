@@ -14,4 +14,6 @@ export const ENV = {
     process.env.DATABASE_URL ||
     'postgresql://postgres:postgres@localhost:5432/sikkim_yatra_dev?schema=public',
   JWT_SECRET: process.env.JWT_SECRET || 'dev-secret-key-sikkim-yatra',
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
 } as const;
+

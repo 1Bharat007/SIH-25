@@ -21,6 +21,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.121.0",
     "@prisma/client": "^6.4.1",
     "@sikkim-yatra/shared": "*",
     "bcryptjs": "^2.4.3",

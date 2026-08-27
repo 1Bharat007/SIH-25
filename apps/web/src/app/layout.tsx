@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Providers } from './providers';
 import FloatingSOSButton from '../components/safety/FloatingSOSButton';
 import RealtimeAlertBanner from '../components/disaster/RealtimeAlertBanner';
+import AIChatCompanionWidget from '../components/chat/AIChatCompanionWidget';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
@@ -40,9 +41,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <RealtimeAlertBanner />
           {children}
           <FloatingSOSButton />
+          <AIChatCompanionWidget />
         </Providers>
       </body>
     </html>
   );
 }
+
 
