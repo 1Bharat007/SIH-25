@@ -15,6 +15,12 @@ import {
   Grid,
   ArrowLeft,
   FileCheck,
+  Sparkles,
+  Building2,
+  Utensils,
+  Home,
+  Shield,
+  AlertTriangle,
 } from 'lucide-react';
 import { SikkimDistrict, FilterCategory, MapFeatureItem, PlaceSummary } from '@sikkim-yatra/shared';
 import { usePlacesQuery, useMapLayersQuery } from '../../hooks/useTourism';
@@ -31,14 +37,15 @@ const DISTRICTS: (SikkimDistrict | 'all')[] = [
   'Soreng',
 ];
 
-const CATEGORIES: { key: FilterCategory; label: string; icon: string }[] = [
-  { key: 'all', label: 'All Sights', icon: '✨' },
-  { key: 'culture', label: 'Monasteries & Culture', icon: '🛕' },
-  { key: 'food', label: 'Food & Dining', icon: '🍲' },
-  { key: 'stay', label: 'Homestays & Stays', icon: '🏡' },
-  { key: 'safety', label: 'Safety & 24x7 Helplines', icon: '🏥' },
-  { key: 'hazard', label: 'Active Hazard Advisories', icon: '⚠️' },
+const CATEGORIES: { key: FilterCategory; label: string; icon: React.ElementType }[] = [
+  { key: 'all', label: 'All Sights', icon: Sparkles },
+  { key: 'culture', label: 'Monasteries & Culture', icon: Building2 },
+  { key: 'food', label: 'Food & Dining', icon: Utensils },
+  { key: 'stay', label: 'Homestays & Stays', icon: Home },
+  { key: 'safety', label: 'Safety & 24x7 Helplines', icon: Shield },
+  { key: 'hazard', label: 'Active Hazard Advisories', icon: AlertTriangle },
 ];
+
 
 export default function ExplorePage() {
   const [search, setSearch] = useState('');
@@ -225,6 +232,7 @@ export default function ExplorePage() {
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
             {CATEGORIES.map(cat => {
               const active = category === cat.key;
+              const Icon = cat.icon;
               return (
                 <button
                   key={cat.key}
@@ -235,12 +243,13 @@ export default function ExplorePage() {
                       : 'border border-emerald-500/20 bg-slate-950/40 text-emerald-200 hover:bg-emerald-950/50 hover:border-emerald-500/40'
                   }`}
                 >
-                  <span>{cat.icon}</span>
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{cat.label}</span>
                 </button>
               );
             })}
           </div>
+
         </section>
 
         {/* Main Content Layout (Map + Cards) */}

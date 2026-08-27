@@ -103,7 +103,7 @@ export function useRealtimeAlerts() {
           } else if (msg.type === 'ALERT_CREATED' && msg.payload.alert) {
             const newAlert = msg.payload.alert;
             setAlerts((prev) => [newAlert, ...prev.filter((a) => a.id !== newAlert.id)]);
-            setLatestMessage(msg.payload.message || `🚨 New Hazard Broadcast: ${newAlert.title}`);
+            setLatestMessage(msg.payload.message || `New Hazard Broadcast: ${newAlert.title}`);
             setLastUpdated(new Date());
 
             if (newAlert.severity === 'critical' || newAlert.severity === 'high') {
@@ -112,12 +112,13 @@ export function useRealtimeAlerts() {
           } else if (msg.type === 'ALERT_UPDATED' && msg.payload.alert) {
             const updated = msg.payload.alert;
             setAlerts((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
-            setLatestMessage(msg.payload.message || `⚠️ Hazard Updated: ${updated.title}`);
+            setLatestMessage(msg.payload.message || `Hazard Updated: ${updated.title}`);
             setLastUpdated(new Date());
           } else if (msg.type === 'ALERT_RESOLVED' && msg.payload.alert) {
             const resolved = msg.payload.alert;
             setAlerts((prev) => prev.map((a) => (a.id === resolved.id ? resolved : a)));
-            setLatestMessage(msg.payload.message || `✅ Hazard Resolved: ${resolved.title}`);
+            setLatestMessage(msg.payload.message || `Hazard Resolved: ${resolved.title}`);
+
             setLastUpdated(new Date());
           } else if (msg.type === 'ALERT_DELETED' && msg.payload.alertId) {
             const id = msg.payload.alertId;

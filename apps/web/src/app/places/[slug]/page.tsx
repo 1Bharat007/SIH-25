@@ -271,13 +271,14 @@ export default function PlaceDetailPage({ params }: { params: Promise<{ slug: st
             {place.history && (
               <div className="mt-6 rounded-2xl border border-amber-500/20 bg-amber-950/20 p-5">
                 <h4 className="text-sm font-bold text-amber-300 flex items-center gap-1.5">
-                  <span>📜 Monastery Heritage & Sacred Lore</span>
+                  <span>Monastery Heritage & Sacred Lore</span>
                 </h4>
                 <p className="mt-2 text-xs sm:text-sm text-amber-100/80 leading-relaxed font-serif">
                   {place.history}
                 </p>
               </div>
             )}
+
           </div>
         </section>
 

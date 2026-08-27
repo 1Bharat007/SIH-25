@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import Link from 'next/link';
-import { Phone, Layers, ArrowRight, ShieldAlert } from 'lucide-react';
+import { Phone, Layers, ArrowRight, ShieldAlert, Building2, Utensils, Home, AlertTriangle } from 'lucide-react';
 import { MapLayersResponse, MapFeatureItem, HazardAlertSummary } from '@sikkim-yatra/shared';
+
 
 // Sikkim Geographic Center & Bounds
 const SIKKIM_CENTER: [number, number] = [27.45, 88.55];
@@ -27,43 +28,44 @@ function MapController({ center, zoom }: { center?: [number, number]; zoom?: num
 // Generate rich HTML SVG divIcon for Leaflet markers
 function createCustomIcon(type: string, severity?: string) {
   let bgColor = '#0fb49a';
-  let iconSvg = '📍';
+  let iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
   switch (type) {
     case 'monastery':
     case 'cultural':
       bgColor = '#d97706'; // Amber / Monastery Gold
-      iconSvg = '🛕';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V12a6 6 0 0 1 12 0v10"/><path d="M12 2v4"/><path d="M2 22h20"/></svg>`;
       break;
     case 'food':
       bgColor = '#10b981'; // Emerald
-      iconSvg = '🍲';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2"/><path d="M15 11v11"/><path d="M5 2v10c0 2 1 3 3 3h1v7"/><path d="M9 2v6"/></svg>`;
       break;
     case 'stay':
       bgColor = '#06b6d4'; // Cyan
-      iconSvg = '🏡';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
       break;
     case 'vendor':
       bgColor = '#8b5cf6'; // Purple
-      iconSvg = '🛍️';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
       break;
     case 'hospital':
       bgColor = '#ef4444'; // Red
-      iconSvg = '🏥';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v12"/><path d="M6 12h12"/></svg>`;
       break;
     case 'police':
       bgColor = '#3b82f6'; // Blue
-      iconSvg = '👮';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>`;
       break;
     case 'helpline':
       bgColor = '#ec4899'; // Pink
-      iconSvg = '📞';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
       break;
     case 'hazard_zone':
       bgColor = severity === 'high' ? '#dc2626' : '#f59e0b';
-      iconSvg = '⚠️';
+      iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>`;
       break;
   }
+
 
   const html = `
     <div style="
@@ -280,7 +282,7 @@ export default function SikkimMap({
               <label className="flex items-center justify-between gap-2 cursor-pointer hover:opacity-90">
                 <div className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/20 text-amber-400 text-xs">
-                    🛕
+                    <Building2 className="w-3 h-3" />
                   </span>
                   <span>Monasteries & Heritage</span>
                 </div>
@@ -296,7 +298,7 @@ export default function SikkimMap({
               <label className="flex items-center justify-between gap-2 cursor-pointer hover:opacity-90">
                 <div className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 text-xs">
-                    🍲
+                    <Utensils className="w-3 h-3" />
                   </span>
                   <span>Restaurants & Cafes</span>
                 </div>
@@ -312,7 +314,7 @@ export default function SikkimMap({
               <label className="flex items-center justify-between gap-2 cursor-pointer hover:opacity-90">
                 <div className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400 text-xs">
-                    🏡
+                    <Home className="w-3 h-3" />
                   </span>
                   <span>Homestays & Vendors</span>
                 </div>
@@ -328,7 +330,7 @@ export default function SikkimMap({
               <label className="flex items-center justify-between gap-2 cursor-pointer hover:opacity-90">
                 <div className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500/20 text-rose-400 text-xs">
-                    🚑
+                    <ShieldAlert className="w-3 h-3" />
                   </span>
                   <span>Hospitals & Police (24x7)</span>
                 </div>
@@ -344,7 +346,7 @@ export default function SikkimMap({
               <label className="flex items-center justify-between gap-2 cursor-pointer hover:opacity-90">
                 <div className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500/20 text-red-400 text-xs">
-                    ⚠️
+                    <AlertTriangle className="w-3 h-3" />
                   </span>
                   <span>Active Hazard Advisories</span>
                 </div>
@@ -362,3 +364,4 @@ export default function SikkimMap({
     </div>
   );
 }
+

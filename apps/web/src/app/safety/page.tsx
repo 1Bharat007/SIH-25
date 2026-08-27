@@ -278,8 +278,9 @@ export default function SafetyHubPage() {
                     : 'text-rose-300 hover:text-white'
                 }`}
               >
-                Avoid After Dark ⚠️
+                Avoid After Dark
               </button>
+
             </div>
           </div>
 

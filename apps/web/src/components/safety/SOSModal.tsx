@@ -13,6 +13,12 @@ import {
   RefreshCw,
   Copy,
   Check,
+  HeartPulse,
+  Snowflake,
+  Wrench,
+  Compass,
+  AlertCircle,
+  Shield,
 } from 'lucide-react';
 import { EmergencyDistressType, SOSDispatchResult } from '@sikkim-yatra/shared';
 import {
@@ -22,14 +28,15 @@ import {
   useSOSMutation,
 } from '../../hooks/useSafety';
 
-const EMERGENCY_TYPES: { type: EmergencyDistressType; icon: string; label: string }[] = [
-  { type: 'Medical Emergency', icon: '🚑', label: 'Medical Aid / Altitude Sickness' },
-  { type: 'Stranded in Snow / Landslide', icon: '❄️', label: 'Stranded (Snow / Landslide)' },
-  { type: 'Vehicle Breakdown', icon: '🚗', label: 'Vehicle Breakdown in Pass' },
-  { type: 'Lost in Mountain Trail', icon: '🏔️', label: 'Lost / Disoriented in Trail' },
-  { type: 'Harassment / Security Threat', icon: '👮', label: 'Security / Harassment Threat' },
-  { type: 'Other Emergency', icon: '🆘', label: 'General Emergency Distress' },
+const EMERGENCY_TYPES: { type: EmergencyDistressType; icon: React.ElementType; label: string }[] = [
+  { type: 'Medical Emergency', icon: HeartPulse, label: 'Medical Aid / Altitude Sickness' },
+  { type: 'Stranded in Snow / Landslide', icon: Snowflake, label: 'Stranded (Snow / Landslide)' },
+  { type: 'Vehicle Breakdown', icon: Wrench, label: 'Vehicle Breakdown in Pass' },
+  { type: 'Lost in Mountain Trail', icon: Compass, label: 'Lost / Disoriented in Trail' },
+  { type: 'Harassment / Security Threat', icon: Shield, label: 'Security / Harassment Threat' },
+  { type: 'Other Emergency', icon: AlertCircle, label: 'General Emergency Distress' },
 ];
+
 
 interface SOSModalProps {
   isOpen: boolean;
@@ -290,7 +297,7 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
               {nearestEmergency && (
                 <div className="mt-3 rounded-xl bg-black/40 p-2.5 flex items-center justify-between text-xs border border-rose-900/40">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">👮</span>
+                    <Shield className="h-4 w-4 text-rose-400 shrink-0" />
                     <div>
                       <span className="font-semibold text-white">
                         {nearestEmergency.nearestPolice.name}
@@ -316,22 +323,26 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
                 Select Nature of Distress:
               </label>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {EMERGENCY_TYPES.map(item => (
-                  <button
-                    key={item.type}
-                    onClick={() => setSelectedType(item.type)}
-                    className={`flex items-center gap-2.5 rounded-2xl border p-3 text-left transition-all ${
-                      selectedType === item.type
-                        ? 'border-rose-500 bg-rose-600/30 text-white shadow-md'
-                        : 'border-rose-900/30 bg-slate-950/40 text-slate-300 hover:bg-rose-950/30 hover:border-rose-700/50'
-                    }`}
-                  >
-                    <span className="text-lg">{item.icon}</span>
-                    <span className="text-xs font-semibold">{item.label}</span>
-                  </button>
-                ))}
+                {EMERGENCY_TYPES.map(item => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.type}
+                      onClick={() => setSelectedType(item.type)}
+                      className={`flex items-center gap-2.5 rounded-2xl border p-3 text-left transition-all ${
+                        selectedType === item.type
+                          ? 'border-rose-500 bg-rose-600/30 text-white shadow-md'
+                          : 'border-rose-900/30 bg-slate-950/40 text-slate-300 hover:bg-rose-950/30 hover:border-rose-700/50'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4 text-rose-400 shrink-0" />
+                      <span className="text-xs font-semibold">{item.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+
 
             {/* Optional Distress Notes */}
             <div>
