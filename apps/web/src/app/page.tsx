@@ -24,6 +24,7 @@ import {
   Map as MapIcon,
   Navigation,
   ArrowRight,
+  HardDrive,
 } from 'lucide-react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useHealthCheck } from '../hooks/useHealthCheck';
@@ -68,7 +69,7 @@ export default function HomePage() {
                   Sikkim Yatra
                 </h1>
                 <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
-                  v0.3.0 Safety & SOS
+                  v0.4.0 Offline-First
                 </span>
               </div>
               <p className="text-xs text-emerald-300/80 sm:text-sm">
@@ -79,6 +80,14 @@ export default function HomePage() {
 
           {/* Navigation Links & Network / PWA Status Pills */}
           <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/offline-settings"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-teal-500/40 bg-teal-950/40 px-3.5 py-1.5 text-xs font-bold text-teal-300 shadow-md hover:bg-teal-900/50 transition-all"
+            >
+              <HardDrive className="h-3.5 w-3.5 text-teal-400" />
+              <span>Offline Data</span>
+            </Link>
+
             <Link
               href="/culture"
               className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-950/40 px-3.5 py-1.5 text-xs font-bold text-amber-300 shadow-md hover:bg-amber-900/50 transition-all"
@@ -110,6 +119,7 @@ export default function HomePage() {
               <MapIcon className="h-3.5 w-3.5" />
               <span>Explore Map</span>
             </Link>
+
 
             <div
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-md transition-all ${
