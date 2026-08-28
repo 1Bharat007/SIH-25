@@ -4,9 +4,10 @@
   "private": true,
   "description": "Next.js Offline-First PWA for Sikkim Yatra",
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -H 127.0.0.1 -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
+
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"
   },

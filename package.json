@@ -9,9 +9,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=@sikkim-yatra/web",
     "dev:server": "turbo run dev --filter=@sikkim-yatra/server",
+
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
