@@ -6,6 +6,8 @@ import {
   getPanoramaById,
   getTraditionalAttire,
   getFestivals,
+  getGarments,
+  getGarmentById,
 } from '../controllers/culture.controller.js';
 
 const router = Router();
@@ -16,5 +18,8 @@ router.get('/panoramas', getPanoramaScenes);
 router.get('/panoramas/:id', getPanoramaById);
 router.get('/attire', getTraditionalAttire);
 router.get('/festivals', getFestivals);
+router.get('/garments', getGarments);
+router.get('/garments/:id', getGarmentById);
 
 export const cultureRoutes = router;
+

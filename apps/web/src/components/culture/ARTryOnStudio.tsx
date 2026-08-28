@@ -303,9 +303,9 @@ export default function ARTryOnStudio({
 
                   // Target garment scale
                   const targetGarmentWidth =
-                    shoulderDist * garment.anchors.widthScaleRatio * manualScale;
+                    shoulderDist * garment.anchorPoints.widthScaleRatio * manualScale;
                   const targetGarmentHeight =
-                    torsoHeight * garment.anchors.heightScaleRatio * manualScale;
+                    torsoHeight * garment.anchorPoints.heightScaleRatio * manualScale;
 
                   // Apply Temporal Smoothing (Exponential Moving Average)
                   const alpha = 0.65; // Smoothing factor (0.0 = frozen, 1.0 = raw jerky)
@@ -348,8 +348,8 @@ export default function ARTryOnStudio({
 
                     // Anchor calculation:
                     // Align garment neck center at origin (0, 0)
-                    const anchorOffsetX = -prev.width * garment.anchors.neckCenterX;
-                    const anchorOffsetY = -prev.height * garment.anchors.neckCenterY;
+                    const anchorOffsetX = -prev.width * garment.anchorPoints.neckCenterX;
+                    const anchorOffsetY = -prev.height * garment.anchorPoints.neckCenterY;
 
                     // Draw transformed garment
                     ctx.drawImage(
@@ -362,6 +362,7 @@ export default function ARTryOnStudio({
 
                     ctx.restore();
                   }
+
 
                   // Optional Debug Skeleton Overlay
                   if (showDebugSkeleton) {

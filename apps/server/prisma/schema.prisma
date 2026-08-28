@@ -86,7 +86,26 @@ enum SOSStatus {
   FALSE_ALARM
 }
 
+enum GarmentCommunity {
+  BHUTIA
+  LEPCHA
+  NEPALI
+  UNISEX_SIKKIMESE
+}
+
+enum GarmentGender {
+  MALE
+  FEMALE
+  UNISEX
+}
+
+enum GarmentAgeGroup {
+  ADULT
+  CHILD
+}
+
 // -----------------------------------------------------------------------------
+
 // AUTHENTICATION & USERS (NextAuth.js Adapter Compatible)
 // -----------------------------------------------------------------------------
 
@@ -330,3 +349,29 @@ model SOSRequest {
   @@index([status])
   @@index([createdAt])
 }
+
+// -----------------------------------------------------------------------------
+// TRADITIONAL SIKKIMESE ATTIRE & AR TRY-ON WARDROBE
+// -----------------------------------------------------------------------------
+
+model Garment {
+  id                  String           @id @default(cuid())
+  name                String
+  nativeName          String?
+  community           GarmentCommunity
+  categorySlug        String
+  gender              GarmentGender
+  ageGroup            GarmentAgeGroup  @default(ADULT)
+  imageUrl            String
+  thumbnailUrl        String?
+  anchorPoints        Json
+  culturalDescription String           @db.Text
+  festivalOccasions   String[]
+  isFeatured          Boolean          @default(false)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@index([community, gender, ageGroup])
+  @@index([categorySlug])
+}
+

@@ -124,3 +124,43 @@ export interface SikkimFestival {
   district: SikkimDistrict | 'All Districts';
   images: string[];
 }
+
+export interface GarmentAnchorPoints {
+  neckCenterX: number;
+  neckCenterY: number;
+  leftShoulderX: number;
+  leftShoulderY: number;
+  rightShoulderX: number;
+  rightShoulderY: number;
+  waistCenterY: number;
+  widthScaleRatio: number;
+  heightScaleRatio: number;
+}
+
+
+export type GarmentGenderType = 'male' | 'female' | 'unisex';
+export type GarmentAgeGroupType = 'adult' | 'child';
+
+export interface GarmentItem {
+  id: string;
+  name: string;
+  nativeName?: string;
+  community: SikkimeseCommunity;
+  categorySlug: string; // e.g., 'bakhu-kho', 'thokro-dum', 'gunyu-cholo', 'daura-suruwal'
+  gender: GarmentGenderType;
+  ageGroup: GarmentAgeGroupType;
+  imageUrl: string;
+  thumbnailUrl?: string;
+  anchorPoints: GarmentAnchorPoints;
+  culturalDescription: string;
+  festivalOccasions: string[];
+  isFeatured?: boolean;
+}
+
+export interface GarmentFilterParams {
+  community?: SikkimeseCommunity | 'all';
+  gender?: GarmentGenderType | 'all';
+  ageGroup?: GarmentAgeGroupType | 'all';
+  search?: string;
+}
+

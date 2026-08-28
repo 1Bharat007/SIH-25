@@ -7,6 +7,7 @@ import {
   SikkimFestival,
   MonasteryLineage,
   SikkimeseCommunity,
+  GarmentItem,
 } from '@sikkim-yatra/shared';
 import {
   queryMonasteries,
@@ -16,6 +17,8 @@ import {
   queryFestivals,
   SIKKIM_PANORAMA_SCENES,
 } from '../data/culture-data.js';
+import { SIKKIM_GARMENT_CATALOG, queryGarments } from '../data/garment-catalog.js';
+
 
 export async function getMonasteries(
   req: Request,
@@ -139,3 +142,49 @@ export async function getFestivals(
     timestamp: new Date().toISOString(),
   });
 }
+
+export async function getGarments(
+  req: Request,
+  res: Response<ApiResponse<GarmentItem[]>>
+): Promise<void> {
+  const { community, gender, ageGroup, search } = req.query;
+
+  const garments = queryGarments({
+    community: community as string,
+    gender: gender as string,
+    ageGroup: ageGroup as string,
+    search: search as string,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: `Retrieved ${garments.length} traditional Sikkimese wardrobe garments for AR Try-On`,
+    data: garments,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export async function getGarmentById(
+  req: Request<{ id: string }>,
+  res: Response<ApiResponse<GarmentItem>>
+): Promise<void> {
+  const { id } = req.params;
+  const garment = SIKKIM_GARMENT_CATALOG.find((g) => g.id === id);
+
+  if (!garment) {
+    res.status(404).json({
+      success: false,
+      message: `Garment with ID "${id}" was not found in wardrobe catalog`,
+      timestamp: new Date().toISOString(),
+    });
+    return;
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `Retrieved garment "${garment.name}"`,
+    data: garment,
+    timestamp: new Date().toISOString(),
+  });
+}
+

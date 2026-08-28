@@ -8,6 +8,8 @@ import {
   queryFestivals,
   SIKKIM_PANORAMA_SCENES,
 } from '../data/culture-data.js';
+import { SIKKIM_GARMENT_CATALOG, queryGarments } from '../data/garment-catalog.js';
+
 
 
 describe('Cultural & AR Module - Sacred Monasteries & Lineages', () => {
@@ -106,4 +108,45 @@ describe('Cultural & AR Module - Traditional Attire & Festivals', () => {
         pangLhabsol.name.includes('Kanchenjunga')
     );
   });
+
+  it('should contain 12 traditional garments across Bhutia, Lepcha, and Nepali communities with valid anchor metadata', () => {
+    assert.strictEqual(SIKKIM_GARMENT_CATALOG.length, 12, 'Expected exactly 12 traditional outfits in wardrobe');
+
+    for (const g of SIKKIM_GARMENT_CATALOG) {
+      assert.ok(g.id && g.name && g.community && g.categorySlug && g.gender && g.ageGroup);
+      assert.ok(g.imageUrl.startsWith('data:image/svg+xml'));
+      assert.ok(g.culturalDescription);
+      assert.ok(g.festivalOccasions.length > 0);
+
+      // Validate calibrated anchor coordinates
+      const anchors = g.anchorPoints;
+      assert.strictEqual(anchors.neckCenterX, 0.5, `${g.id} neckCenterX must be 0.5`);
+      assert.ok(anchors.neckCenterY >= 0.1 && anchors.neckCenterY <= 0.25, `${g.id} neckCenterY out of bounds`);
+      assert.ok(anchors.leftShoulderX >= 0.15 && anchors.leftShoulderX <= 0.35, `${g.id} leftShoulderX out of bounds`);
+      assert.ok(anchors.rightShoulderX >= 0.65 && anchors.rightShoulderX <= 0.85, `${g.id} rightShoulderX out of bounds`);
+      assert.ok(anchors.widthScaleRatio >= 1.5 && anchors.widthScaleRatio <= 2.2, `${g.id} widthScaleRatio out of bounds`);
+      assert.ok(anchors.heightScaleRatio >= 1.7 && anchors.heightScaleRatio <= 2.4, `${g.id} heightScaleRatio out of bounds`);
+    }
+  });
+
+  it('should correctly filter garments by community, gender, and age group', () => {
+    const bhutiaWomen = queryGarments({ community: 'Bhutia', gender: 'female' });
+    assert.ok(bhutiaWomen.length >= 2, 'Expected at least 2 Bhutia women outfits');
+    for (const item of bhutiaWomen) {
+      assert.strictEqual(item.community, 'Bhutia');
+      assert.ok(item.gender === 'female' || item.gender === 'unisex');
+    }
+
+
+    const lepchaMen = queryGarments({ community: 'Lepcha', gender: 'male' });
+    assert.ok(lepchaMen.length >= 1);
+    assert.strictEqual(lepchaMen[0]?.id, 'lepcha-men-thokro-dum');
+
+    const nepaliChildren = queryGarments({ community: 'Nepali', ageGroup: 'child' });
+    assert.strictEqual(nepaliChildren.length, 2, 'Expected 2 Nepali children outfits');
+
+    const searchResult = queryGarments({ search: 'Daura' });
+    assert.ok(searchResult.length >= 2);
+  });
 });
+
