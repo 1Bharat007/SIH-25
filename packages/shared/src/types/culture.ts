@@ -141,6 +141,27 @@ export interface GarmentAnchorPoints {
 export type GarmentGenderType = 'male' | 'female' | 'unisex';
 export type GarmentAgeGroupType = 'adult' | 'child';
 
+export interface ArtisanCraftNotes {
+  materials: string[];
+  weavingTechnique: string;
+  producingRegion: string;
+  originLore: string;
+  preservationStatus: 'Thriving' | 'Heritage Preserved' | 'Rare Indigenous';
+}
+
+export interface LocalArtisanVendor {
+  id: string;
+  name: string;
+  district: SikkimDistrict;
+  address: string;
+  contactPhone: string;
+  rentalPricePerDay: string;
+  purchasePriceRange: string;
+  isGovtCertified: boolean;
+  latitude?: number;
+  longitude?: number;
+}
+
 export interface GarmentItem {
   id: string;
   name: string;
@@ -154,6 +175,8 @@ export interface GarmentItem {
   anchorPoints: GarmentAnchorPoints;
   culturalDescription: string;
   festivalOccasions: string[];
+  craftNotes?: ArtisanCraftNotes;
+  localVendors?: LocalArtisanVendor[];
   isFeatured?: boolean;
 }
 
@@ -163,6 +186,7 @@ export interface GarmentFilterParams {
   ageGroup?: GarmentAgeGroupType | 'all';
   search?: string;
 }
+
 
 export interface HeadgearAnchorPoints {
   crownCenterX: number;

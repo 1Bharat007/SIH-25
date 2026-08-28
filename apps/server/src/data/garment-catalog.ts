@@ -15,7 +15,6 @@ function createGarmentSvgDataUri(
   switch (style) {
     case 'bakhu_male':
       innerBody = `
-        <!-- Male Bakhu Robe with Long Silk Sleeves -->
         <path d="M 120 180 L 15 290 L 65 340 L 165 240 Z" fill="${innerColor}" stroke="#0f172a" stroke-width="2"/>
         <path d="M 480 180 L 585 290 L 535 340 L 435 240 Z" fill="${innerColor}" stroke="#0f172a" stroke-width="2"/>
         <path d="M 230 120 C 170 125 140 145 130 160 L 140 380 L 120 520 L 100 810 C 100 830 130 840 200 840 L 400 840 C 470 840 500 830 500 810 L 480 520 L 460 380 L 470 160 C 460 145 430 125 370 120 Z" fill="${baseColor}" stroke="#1e293b" stroke-width="3"/>
@@ -29,11 +28,9 @@ function createGarmentSvgDataUri(
     case 'pangden':
     case 'bakhu_female':
       innerBody = `
-        <!-- Female Bakhu with Sleeveless Vest + Bright Inner Honju Blouse -->
         <path d="M 120 180 L 20 280 L 70 330 L 170 240 Z" fill="${innerColor}" stroke="#042f2e" stroke-width="2"/>
         <path d="M 480 180 L 580 280 L 530 330 L 430 240 Z" fill="${innerColor}" stroke="#042f2e" stroke-width="2"/>
         <path d="M 230 120 C 175 125 145 145 135 160 L 150 380 L 120 520 L 100 820 C 100 840 130 845 200 845 L 400 845 C 470 845 500 840 500 820 L 480 520 L 450 380 L 465 160 C 455 145 425 125 370 120 Z" fill="${baseColor}" stroke="#1f2937" stroke-width="3"/>
-        <!-- Striped Pangden Apron for married Bhutia women -->
         <rect x="175" y="460" width="250" height="340" rx="6" fill="#f59e0b" stroke="#78350f" stroke-width="2"/>
         <path d="M 175 485 L 425 485 M 175 510 L 425 510 M 175 535 L 425 535 M 175 560 L 425 560 M 175 585 L 425 585 M 175 610 L 425 610 M 175 635 L 425 635 M 175 660 L 425 660 M 175 685 L 425 685 M 175 710 L 425 710 M 175 735 L 425 735 M 175 760 L 425 760" stroke="#dc2626" stroke-width="8"/>
         <rect x="150" y="445" width="300" height="35" rx="8" fill="${sashColor}" stroke="#78350f" stroke-width="2"/>
@@ -42,12 +39,9 @@ function createGarmentSvgDataUri(
 
     case 'lepcha_male':
       innerBody = `
-        <!-- Lepcha Thokro-Dum Diagonal Striped Wrap -->
         <path d="M 140 180 L 30 270 L 75 315 L 175 235 Z" fill="${innerColor}" stroke="#1e293b" stroke-width="2"/>
         <path d="M 460 180 L 570 270 L 525 315 L 425 235 Z" fill="${innerColor}" stroke="#1e293b" stroke-width="2"/>
-        <!-- Main handwoven striped body -->
         <path d="M 230 120 L 140 160 L 150 400 L 130 540 L 120 780 C 120 800 150 810 220 810 L 380 810 C 450 810 480 800 480 780 L 470 540 L 450 400 L 460 160 Z" fill="${baseColor}" stroke="#334155" stroke-width="3"/>
-        <!-- Diagonal cross-body shawl weave -->
         <path d="M 140 160 L 470 540 L 420 540 L 140 210 Z" fill="${trimColor}" opacity="0.85"/>
         <path d="M 140 230 L 420 570 L 370 570 L 140 280 Z" fill="${trimColor}" opacity="0.85"/>
         <rect x="145" y="460" width="310" height="40" rx="8" fill="${sashColor}" stroke="#0f172a" stroke-width="2"/>
@@ -56,13 +50,10 @@ function createGarmentSvgDataUri(
 
     case 'lepcha_female':
       innerBody = `
-        <!-- Lepcha Dumbun / Dumdem Ankle-length graceful wrap -->
         <path d="M 130 180 L 35 275 L 80 320 L 175 235 Z" fill="${innerColor}" stroke="#064e3b" stroke-width="2"/>
         <path d="M 470 180 L 565 275 L 520 320 L 425 235 Z" fill="${innerColor}" stroke="#064e3b" stroke-width="2"/>
         <path d="M 230 120 C 175 125 145 145 135 160 L 145 380 L 130 520 L 110 820 C 110 840 140 845 200 845 L 400 845 C 460 845 490 840 490 820 L 470 520 L 455 380 L 465 160 Z" fill="${baseColor}" stroke="#064e3b" stroke-width="3"/>
-        <!-- Soft high collar Tago -->
         <path d="M 240 115 C 270 100 330 100 360 115 L 345 170 C 320 160 280 160 255 170 Z" fill="${innerColor}" stroke="#047857" stroke-width="2"/>
-        <!-- Nyamrek embroidered sash -->
         <rect x="140" y="450" width="320" height="45" rx="8" fill="${sashColor}" stroke="#831843" stroke-width="2"/>
         <circle cx="300" cy="472" r="14" fill="#f43f5e" stroke="#ffe4e6" stroke-width="2"/>
       `;
@@ -70,35 +61,26 @@ function createGarmentSvgDataUri(
 
     case 'daura':
       innerBody = `
-        <!-- Nepali Daura Suruwal Tunic + Askot Embroidered Waistcoat -->
         <path d="M 120 180 L 20 280 L 65 330 L 165 240 Z" fill="${innerColor}" stroke="#334155" stroke-width="2"/>
         <path d="M 480 180 L 580 280 L 535 330 L 435 240 Z" fill="${innerColor}" stroke="#334155" stroke-width="2"/>
-        <!-- Daura 8-string cross-tied tunic -->
         <path d="M 230 120 L 135 160 L 145 420 L 110 650 L 200 660 L 400 660 L 490 650 L 455 420 L 465 160 Z" fill="${innerColor}" stroke="#cbd5e1" stroke-width="2.5"/>
-        <!-- Askot (Waistcoat) over Daura -->
         <path d="M 230 125 L 145 165 L 155 460 L 250 470 L 260 200 L 340 200 L 350 470 L 445 460 L 455 165 L 370 125 Z" fill="${baseColor}" stroke="#0f172a" stroke-width="3"/>
-        <!-- Golden buttons on Askot -->
         <circle cx="300" cy="240" r="5" fill="${trimColor}"/>
         <circle cx="300" cy="290" r="5" fill="${trimColor}"/>
         <circle cx="300" cy="340" r="5" fill="${trimColor}"/>
         <circle cx="300" cy="390" r="5" fill="${trimColor}"/>
         <circle cx="300" cy="440" r="5" fill="${trimColor}"/>
-        <!-- Patuka waist wrap -->
         <rect x="135" y="470" width="330" height="40" rx="6" fill="${sashColor}" stroke="#991b1b" stroke-width="2"/>
       `;
       break;
 
     case 'gunyu':
       innerBody = `
-        <!-- Nepali Gunyu Cholo (Velvet Cholo Blouse + Printed Gunyu Skirt) -->
         <path d="M 120 180 L 25 285 L 70 330 L 165 240 Z" fill="${trimColor}" stroke="#831843" stroke-width="2"/>
         <path d="M 480 180 L 575 285 L 530 330 L 435 240 Z" fill="${trimColor}" stroke="#831843" stroke-width="2"/>
-        <!-- Cholo Velvet Bodice -->
         <path d="M 230 120 L 140 160 L 150 370 L 450 370 L 460 160 L 370 120 Z" fill="${baseColor}" stroke="#500724" stroke-width="3"/>
         <path d="M 250 150 Q 300 230 360 270 L 440 370" fill="none" stroke="${trimColor}" stroke-width="5"/>
-        <!-- Red Patuka Waistband -->
         <rect x="140" y="365" width="320" height="50" rx="8" fill="${sashColor}" stroke="#7f1d1d" stroke-width="2"/>
-        <!-- Gunyu / Fariya Flared Skirt -->
         <path d="M 150 415 L 100 820 C 100 840 130 845 200 845 L 400 845 C 470 845 500 840 500 820 L 450 415 Z" fill="#991b1b" stroke="#450a0a" stroke-width="3"/>
         <path d="M 100 805 L 500 805" stroke="${trimColor}" stroke-width="12"/>
       `;
@@ -106,7 +88,6 @@ function createGarmentSvgDataUri(
 
     case 'child':
       innerBody = `
-        <!-- Scaled Junior Robe for Children -->
         <path d="M 130 190 L 35 280 L 75 320 L 165 245 Z" fill="${innerColor}" stroke="#334155" stroke-width="2"/>
         <path d="M 470 190 L 565 280 L 525 320 L 435 245 Z" fill="${innerColor}" stroke="#334155" stroke-width="2"/>
         <path d="M 230 130 C 175 135 145 155 135 170 L 145 380 L 130 500 L 120 730 C 120 750 150 755 210 755 L 390 755 C 450 755 480 750 480 730 L 470 500 L 455 380 L 465 170 Z" fill="${baseColor}" stroke="#1e293b" stroke-width="2.5"/>
@@ -129,6 +110,76 @@ function createGarmentSvgDataUri(
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
+
+// -----------------------------------------------------------------------------
+// VERIFIED SIKKIM ARTISAN VENDORS & WEAVING HUBS
+// -----------------------------------------------------------------------------
+
+const VENDOR_DHH_GANGTOK = {
+  id: 'vendor-dhh-gangtok',
+  name: 'Directorate of Handicrafts and Handlooms (DHH)',
+  district: 'Gangtok' as const,
+  address: 'Zero Point, National Highway 10, Gangtok 737101',
+  contactPhone: '+91 3592 202931',
+  rentalPricePerDay: '₹550 / day (complete set)',
+  purchasePriceRange: '₹4,500 – ₹18,000 (authentic silk)',
+  isGovtCertified: true,
+  latitude: 27.3389,
+  longitude: 88.6138,
+};
+
+const VENDOR_KANCHENJUNGA_SILK = {
+  id: 'vendor-kanchenjunga-silk',
+  name: 'Kanchenjunga Silk & Brocade Guild',
+  district: 'Pakyong' as const,
+  address: 'Bazaar Road, Singtam / Pakyong Cluster',
+  contactPhone: '+91 98320 44512',
+  rentalPricePerDay: '₹600 / day (with jewellery)',
+  purchasePriceRange: '₹5,000 – ₹22,000',
+  isGovtCertified: true,
+  latitude: 27.2355,
+  longitude: 88.4983,
+};
+
+const VENDOR_DZONGU_LEPCHA = {
+  id: 'vendor-dzongu-lepcha',
+  name: 'Dzongu Indigenous Lepcha Weavers Association',
+  district: 'Mangan' as const,
+  address: 'Passingdang, Dzongu Protected Reserve, North Sikkim',
+  contactPhone: '+91 94341 88920',
+  rentalPricePerDay: '₹450 / day (with Sumbok cap)',
+  purchasePriceRange: '₹3,500 – ₹12,000 (natural nettle & cotton)',
+  isGovtCertified: true,
+  latitude: 27.5218,
+  longitude: 88.5412,
+};
+
+const VENDOR_NAMCHI_DHAKA = {
+  id: 'vendor-namchi-dhaka',
+  name: 'Namchi Handloom & Dhaka Weaving Cooperative',
+  district: 'Namchi' as const,
+  address: 'Khadi Gramodyog Bhavan, Central Park, Namchi 737126',
+  contactPhone: '+91 3595 254810',
+  rentalPricePerDay: '₹500 / day (Daura + Askot + Topi)',
+  purchasePriceRange: '₹3,200 – ₹9,500',
+  isGovtCertified: true,
+  latitude: 27.1667,
+  longitude: 88.35,
+};
+
+const VENDOR_PELLING_STUDIO = {
+  id: 'vendor-pelling-studio',
+  name: 'Pelling Heritage Cultural Dress Studio',
+  district: 'Gyalshing' as const,
+  address: 'Near Pemayangtse Monastery Road, Upper Pelling',
+  contactPhone: '+91 97330 12894',
+  rentalPricePerDay: '₹400 / day (photo ready)',
+  purchasePriceRange: '₹3,800 – ₹14,000',
+  isGovtCertified: false,
+  latitude: 27.3167,
+  longitude: 88.2333,
+};
+
 
 /**
  * Complete 12-Outfit Wardrobe Catalog spanning Bhutia, Lepcha, and Nepali traditional attires
@@ -160,6 +211,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Heavy midnight-blue silk/wool robe tied securely at the waist with a woven gold Kera sash, worn over a crisp white standing-collar Honju shirt for formal gatherings and archery festivals.',
     festivalOccasions: ['Losar (New Year)', 'Pang Lhabsol', 'Drupka Teshi'],
+    craftNotes: {
+      materials: ['Handloom Pure Mulberry Silk', 'Tibetan Sheep Wool', 'Gold Thread Trim'],
+      weavingTechnique: 'Pit-loom heavy warp with brocade border embroidery',
+      producingRegion: 'Directorate of Handicrafts (Gangtok) & North Sikkim Valleys',
+      originLore: 'Descended from trans-Himalayan royal robes designed to withstand high altitude winds while leaving arms free for archery and riding.',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_DHH_GANGTOK, VENDOR_KANCHENJUNGA_SILK],
     isFeatured: true,
   },
   {
@@ -185,6 +244,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Iconic sleeveless emerald silk Bakhu accompanied by the multi-colored handwoven wool Pangden apron, signifying marriage and cultural pride in Bhutia heritage.',
     festivalOccasions: ['Losar (New Year)', 'Traditional Weddings', 'Saga Dawa'],
+    craftNotes: {
+      materials: ['Fine Dyed Wool Weft', 'Turquoise Raw Silk', 'Embossed Gold Brocade'],
+      weavingTechnique: 'Backstrap loom 3-striped geometric wool tapestry',
+      producingRegion: 'Lachen, Lachung (Mangan) & Gangtok Handicrafts',
+      originLore: 'The woven Pangden apron is presented during wedding ceremonies by the bride’s maternal family, carrying prayers of long life and prosperity.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_DHH_GANGTOK, VENDOR_PELLING_STUDIO],
     isFeatured: true,
   },
   {
@@ -208,8 +275,16 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
       heightScaleRatio: 2.1,
     },
     culturalDescription:
-      'Flowing royal crimson silk brocade Bakhu with gold lotus motifs and turquoise sleeves, worn by unmarried and festive dancers during monastic celebrations.',
+      'Flowing royal crimson silk brocade Bakhu with gold lotus motifs and turquoise sleeves, worn by festive dancers during monastic celebrations.',
     festivalOccasions: ['Pang Lhabsol', 'Monastery Cham Dances', 'Losar'],
+    craftNotes: {
+      materials: ['Varanasi-Tibetan Brocade Silk', 'Natural Madder Root Dye'],
+      weavingTechnique: 'Jacquard brocade with embossed eight auspicious symbols (Ashtamangala)',
+      producingRegion: 'Singtam Silk Weavers Guild & Gangtok',
+      originLore: 'Worn by court dancers during the sacred warrior dance of Mount Kanchenjunga (Pang Lhabsol).',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_KANCHENJUNGA_SILK, VENDOR_DHH_GANGTOK],
     isFeatured: true,
   },
   {
@@ -235,6 +310,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Scaled lightweight amber silk robe with soft sash designed for children during traditional family prayers and monastic pilgrimages.',
     festivalOccasions: ['Losar', 'Family Ceremonies'],
+    craftNotes: {
+      materials: ['Lightweight Organic Silk', 'Soft Cotton Lining'],
+      weavingTechnique: 'Breathable child-friendly handloom stitch',
+      producingRegion: 'Directorate of Handicrafts (Gangtok)',
+      originLore: 'Given to children during their first Losar celebration to receive elders’ blessings.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_DHH_GANGTOK],
   },
 
   // ---------------------------------------------------------------------------
@@ -263,6 +346,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Handwoven white and maroon striped cotton fabric pinned across the left shoulder and cinched with a Gyaptuk belt, honoring the indigenous forest lore of Mount Tendong.',
     festivalOccasions: ['Tendong Lho Rum Faat', 'Namsoong (Lepcha New Year)'],
+    craftNotes: {
+      materials: ['Indigenous Himalayan Nettle Fibre (Sisnu)', 'Organic Cotton', 'Vegetable Dyes'],
+      weavingTechnique: 'Traditional loin loom warp-faced weave',
+      producingRegion: 'Dzongu Indigenous Reserve & Lingthem (Mangan)',
+      originLore: 'Commemorates the flood legend of Tendong Hill where indigenous Lepcha ancestors were saved by sacred bamboo and hornbill spirits.',
+      preservationStatus: 'Rare Indigenous',
+    },
+    localVendors: [VENDOR_DZONGU_LEPCHA, VENDOR_DHH_GANGTOK],
     isFeatured: true,
   },
   {
@@ -288,6 +379,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Ankle-length sage-green handwoven cotton wrap paired with a loose high-collared Tago blouse and vibrant Nyamrek sash, celebrating the sacred flora of Kanchenjunga.',
     festivalOccasions: ['Namsoong (New Year)', 'Tendong Lho Rum Faat'],
+    craftNotes: {
+      materials: ['Hand-spun Cotton Yarn', 'Nettle Fibre Weave', 'Natural Bark Dyes'],
+      weavingTechnique: 'Loin loom seamless tubular wrap with embroidered selvedge',
+      producingRegion: 'Dzongu Weavers Guild & Mangan',
+      originLore: 'Inspired by the graceful bamboo reeds and mountain orchid blossoms of Teesta valley.',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_DZONGU_LEPCHA, VENDOR_PELLING_STUDIO],
     isFeatured: true,
   },
   {
@@ -313,6 +412,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Authentic miniature cross-body Lepcha handwoven weave with traditional diamond border embroidery for boys and girls.',
     festivalOccasions: ['Namsoong', 'Community Assemblies'],
+    craftNotes: {
+      materials: ['Pure Soft Cotton', 'Natural Dyes'],
+      weavingTechnique: 'Miniature loin loom diamond motif',
+      producingRegion: 'Dzongu Reserve (Mangan)',
+      originLore: 'Worn during ancestral folklore storytelling around the hearth.',
+      preservationStatus: 'Rare Indigenous',
+    },
+    localVendors: [VENDOR_DZONGU_LEPCHA],
   },
 
   // ---------------------------------------------------------------------------
@@ -341,6 +448,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Eight-string cross-tied pristine white cotton Daura tunic fitted with an embroidered black velvet Askot waistcoat and red Patuka sash for formal state ceremonies.',
     festivalOccasions: ['Dashain', 'Tihar', 'Bhanu Jayanti', 'Bagaicha'],
+    craftNotes: {
+      materials: ['100% Khadi Cotton', 'Micro-Velvet Askot', 'Brass Filigree Buttons'],
+      weavingTechnique: 'Eight-knot auspicious binding (representing Astamatrika deities)',
+      producingRegion: 'Namchi Handloom Cooperative & Rhenock Weavers',
+      originLore: 'Each of the eight ties signifies protection from the eight guardian directions according to Vedic-Himalayan folklore.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_DHH_GANGTOK],
     isFeatured: true,
   },
   {
@@ -366,11 +481,19 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Deep magenta velvet cross-tied Cholo blouse paired with a vibrant red gold-printed Gunyu skirt and Patuka sash, marking auspicious occasions and weddings.',
     festivalOccasions: ['Dashain', 'Tihar', 'Teej', 'Weddings'],
+    craftNotes: {
+      materials: ['Embroidered Silk Velvet', 'Gold-leaf Printed Cotton', 'Handloom Red Patuka'],
+      weavingTechnique: 'Pleated flared fariya drape with reinforced waist gathering',
+      producingRegion: 'Namchi & Gangtok Artisan Clusters',
+      originLore: 'Presented during the coming-of-age ceremony (Gunyu Cholo Diyo) marking womanhood and cultural initiation.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_PELLING_STUDIO],
     isFeatured: true,
   },
   {
     id: 'nepali-women-chaubandi-maruni',
-    name: 'Nepali Chaubandi Cholo & Maruni Dance Dress',
+    name: 'Nepali Chaubandi Cholo & Maruni Dress',
     nativeName: 'चौबन्दी चोलो',
     community: 'Nepali',
     categorySlug: 'chaubandi-cholo',
@@ -391,6 +514,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Traditional four-tied Chaubandi bodice paired with pleated performance skirt, celebrated across Sikkim during harvest dances and Maruni folk rituals.',
     festivalOccasions: ['Tihar', 'Maghe Sankranti', 'Maruni Celebrations'],
+    craftNotes: {
+      materials: ['Crimson Cotton Broadcloth', 'Handwoven Gold Zari Border'],
+      weavingTechnique: 'Four-string wrap with rhythmic dance pleats',
+      producingRegion: 'Namchi Central Weavers & Rhenock',
+      originLore: 'Worn by lead dancers in the historic Maruni dance depicting the victory of good over evil.',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_DHH_GANGTOK],
   },
   {
     id: 'nepali-boy-junior-daura',
@@ -415,6 +546,14 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
     culturalDescription:
       'Classic scaled cotton Daura Suruwal tunic with miniature Dhaka printed waistcoat for boys during Dashain blessings.',
     festivalOccasions: ['Dashain Tika', 'Tihar'],
+    craftNotes: {
+      materials: ['Soft Washed Cotton', 'Dhaka Patterned Vest'],
+      weavingTechnique: 'Fitted miniature tailoring with soft inner seams',
+      producingRegion: 'Namchi Handloom Cooperative',
+      originLore: 'Worn when receiving rice Tika and Jamara blessings from family elders.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA],
   },
   {
     id: 'nepali-girl-junior-gunyu-cholo',
@@ -437,8 +576,16 @@ export const SIKKIM_GARMENT_CATALOG: GarmentItem[] = [
       heightScaleRatio: 1.92,
     },
     culturalDescription:
-      'Miniature crimson and gold Gunyu Cholo with velvet bodice for young girls participating in traditional cultural dances.',
+      'Miniature crimson and gold Gunyu Cholo with velvet bodice for young girls participating in traditional cultural celebrations.',
     festivalOccasions: ['Teej', 'Dashain', 'School Cultural Days'],
+    craftNotes: {
+      materials: ['Ruby Velvet Bodice', 'Soft Printed Brocade Skirt'],
+      weavingTechnique: 'Scaled traditional pattern with flexible elasticated inner waistband',
+      producingRegion: 'Namchi & Gangtok Artisan Guilds',
+      originLore: 'Worn by young girls during festive folk performances across Sikkim.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_DHH_GANGTOK],
   },
 ];
 

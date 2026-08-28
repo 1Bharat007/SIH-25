@@ -22,6 +22,7 @@ import {
   X,
   Compass,
   Lightbulb,
+  Share2,
 } from 'lucide-react';
 import {
   TEST_GARMENT_ITEM,
@@ -32,11 +33,14 @@ import {
   preloadAllWardrobeAssets,
 } from '../../utils/garment-assets';
 import { HeadgearItem, GarmentLayerItem } from '@sikkim-yatra/shared';
+import BrandedShareModal from './BrandedShareModal';
 
 interface ARTryOnStudioProps {
   customGarment?: GarmentDefinition;
   onSnapshotCaptured?: (dataUrl: string) => void;
+  onExploreVendors?: () => void;
 }
+
 
 type DetectionStatus =
   | 'uninitialized'
@@ -71,8 +75,10 @@ interface SmoothedHeadState {
 export default function ARTryOnStudio({
   customGarment,
   onSnapshotCaptured,
+  onExploreVendors,
 }: ARTryOnStudioProps) {
   const garment = customGarment || TEST_GARMENT_ITEM;
+
 
   // DOM Refs
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -98,6 +104,8 @@ export default function ARTryOnStudio({
   const [selectedLayer, setSelectedLayer] = useState<GarmentLayerItem | null>(null);
   const [showLayersDrawer, setShowLayersDrawer] = useState<boolean>(false);
   const [showPoseGuide, setShowPoseGuide] = useState<boolean>(false);
+  const [showBrandedShareModal, setShowBrandedShareModal] = useState<boolean>(false);
+
 
   // Fine-tuning adjustments (Manual scale / offset overrides)
   const [manualScale, setManualScale] = useState<number>(1.0);
@@ -1139,15 +1147,22 @@ export default function ARTryOnStudio({
 
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <button
+                onClick={() => setShowBrandedShareModal(true)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Create Branded Share Postcard</span>
+              </button>
+              <button
                 onClick={handleDownloadSnapshot}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all"
+                className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
               >
                 <Download className="w-4 h-4" />
-                <span>Download High-Res Photo (PNG)</span>
+                <span>Download Raw (PNG)</span>
               </button>
               <button
                 onClick={() => setSnapshotDataUrl(null)}
-                className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition-all"
+                className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all"
               >
                 Retake Photo
               </button>
@@ -1155,6 +1170,19 @@ export default function ARTryOnStudio({
           </div>
         </div>
       )}
+
+      {/* Branded Postcard Share Modal */}
+      {showBrandedShareModal && snapshotDataUrl && (
+        <BrandedShareModal
+          rawSnapshotDataUrl={snapshotDataUrl}
+          garment={garment}
+          headgear={selectedHeadgear}
+          layer={selectedLayer}
+          onClose={() => setShowBrandedShareModal(false)}
+          onExploreVendors={onExploreVendors}
+        />
+      )}
     </div>
   );
 }
+

@@ -367,11 +367,14 @@ model Garment {
   anchorPoints        Json
   culturalDescription String           @db.Text
   festivalOccasions   String[]
+  craftNotes          Json?
+  localVendors        Json?
   isFeatured          Boolean          @default(false)
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
   @@index([community, gender, ageGroup])
   @@index([categorySlug])
+
 }
 

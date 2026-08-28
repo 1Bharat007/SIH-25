@@ -117,6 +117,72 @@ function createGarmentSvgDataUri(
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+const VENDOR_DHH_GANGTOK = {
+  id: 'vendor-dhh-gangtok',
+  name: 'Directorate of Handicrafts and Handlooms (DHH)',
+  district: 'Gangtok' as const,
+  address: 'Zero Point, National Highway 10, Gangtok 737101',
+  contactPhone: '+91 3592 202931',
+  rentalPricePerDay: '₹550 / day (complete set)',
+  purchasePriceRange: '₹4,500 – ₹18,000 (authentic silk)',
+  isGovtCertified: true,
+  latitude: 27.3389,
+  longitude: 88.6138,
+};
+
+const VENDOR_KANCHENJUNGA_SILK = {
+  id: 'vendor-kanchenjunga-silk',
+  name: 'Kanchenjunga Silk & Brocade Guild',
+  district: 'Pakyong' as const,
+  address: 'Bazaar Road, Singtam / Pakyong Cluster',
+  contactPhone: '+91 98320 44512',
+  rentalPricePerDay: '₹600 / day (with jewellery)',
+  purchasePriceRange: '₹5,000 – ₹22,000',
+  isGovtCertified: true,
+  latitude: 27.2355,
+  longitude: 88.4983,
+};
+
+const VENDOR_DZONGU_LEPCHA = {
+  id: 'vendor-dzongu-lepcha',
+  name: 'Dzongu Indigenous Lepcha Weavers Association',
+  district: 'Mangan' as const,
+  address: 'Passingdang, Dzongu Protected Reserve, North Sikkim',
+  contactPhone: '+91 94341 88920',
+  rentalPricePerDay: '₹450 / day (with Sumbok cap)',
+  purchasePriceRange: '₹3,500 – ₹12,000 (natural nettle & cotton)',
+  isGovtCertified: true,
+  latitude: 27.5218,
+  longitude: 88.5412,
+};
+
+const VENDOR_NAMCHI_DHAKA = {
+  id: 'vendor-namchi-dhaka',
+  name: 'Namchi Handloom & Dhaka Weaving Cooperative',
+  district: 'Namchi' as const,
+  address: 'Khadi Gramodyog Bhavan, Central Park, Namchi 737126',
+  contactPhone: '+91 3595 254810',
+  rentalPricePerDay: '₹500 / day (Daura + Askot + Topi)',
+  purchasePriceRange: '₹3,200 – ₹9,500',
+  isGovtCertified: true,
+  latitude: 27.1667,
+  longitude: 88.35,
+};
+
+const VENDOR_PELLING_STUDIO = {
+  id: 'vendor-pelling-studio',
+  name: 'Pelling Heritage Cultural Dress Studio',
+  district: 'Gyalshing' as const,
+  address: 'Near Pemayangtse Monastery Road, Upper Pelling',
+  contactPhone: '+91 97330 12894',
+  rentalPricePerDay: '₹400 / day (photo ready)',
+  purchasePriceRange: '₹3,800 – ₹14,000',
+  isGovtCertified: false,
+  latitude: 27.3167,
+  longitude: 88.2333,
+};
+
+
 export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
   {
     id: 'bhutia-men-bakhu-kho',
@@ -139,8 +205,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 2.1,
     },
     culturalDescription:
-      'Heavy midnight-blue silk/wool robe tied securely at the waist with a woven gold Kera sash, worn over a crisp white standing-collar Honju shirt.',
+      'Heavy midnight-blue silk/wool robe tied securely at the waist with a woven gold Kera sash, worn over a crisp white standing-collar Honju shirt for formal gatherings and archery festivals.',
     festivalOccasions: ['Losar (New Year)', 'Pang Lhabsol', 'Drupka Teshi'],
+    craftNotes: {
+      materials: ['Handloom Pure Mulberry Silk', 'Tibetan Sheep Wool', 'Gold Thread Trim'],
+      weavingTechnique: 'Pit-loom heavy warp with brocade border embroidery',
+      producingRegion: 'Directorate of Handicrafts (Gangtok) & North Sikkim Valleys',
+      originLore: 'Descended from trans-Himalayan royal robes designed to withstand high altitude winds while leaving arms free for archery and riding.',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_DHH_GANGTOK, VENDOR_KANCHENJUNGA_SILK],
     isFeatured: true,
   },
   {
@@ -164,8 +238,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 2.15,
     },
     culturalDescription:
-      'Iconic sleeveless emerald silk Bakhu accompanied by the multi-colored handwoven wool Pangden apron, signifying marriage and cultural pride.',
+      'Iconic sleeveless emerald silk Bakhu accompanied by the multi-colored handwoven wool Pangden apron, signifying marriage and cultural pride in Bhutia heritage.',
     festivalOccasions: ['Losar (New Year)', 'Traditional Weddings', 'Saga Dawa'],
+    craftNotes: {
+      materials: ['Fine Dyed Wool Weft', 'Turquoise Raw Silk', 'Embossed Gold Brocade'],
+      weavingTechnique: 'Backstrap loom 3-striped geometric wool tapestry',
+      producingRegion: 'Lachen, Lachung (Mangan) & Gangtok Handicrafts',
+      originLore: 'The woven Pangden apron is presented during wedding ceremonies by the bride’s maternal family, carrying prayers of long life and prosperity.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_DHH_GANGTOK, VENDOR_PELLING_STUDIO],
     isFeatured: true,
   },
   {
@@ -191,6 +273,14 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
     culturalDescription:
       'Flowing royal crimson silk brocade Bakhu with gold lotus motifs and turquoise sleeves, worn by festive dancers during monastic celebrations.',
     festivalOccasions: ['Pang Lhabsol', 'Monastery Cham Dances', 'Losar'],
+    craftNotes: {
+      materials: ['Varanasi-Tibetan Brocade Silk', 'Natural Madder Root Dye'],
+      weavingTechnique: 'Jacquard brocade with embossed eight auspicious symbols (Ashtamangala)',
+      producingRegion: 'Singtam Silk Weavers Guild & Gangtok',
+      originLore: 'Worn by court dancers during the sacred warrior dance of Mount Kanchenjunga (Pang Lhabsol).',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_KANCHENJUNGA_SILK, VENDOR_DHH_GANGTOK],
     isFeatured: true,
   },
   {
@@ -214,8 +304,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 1.95,
     },
     culturalDescription:
-      'Scaled lightweight amber silk robe with soft sash designed for children during traditional family prayers.',
+      'Scaled lightweight amber silk robe with soft sash designed for children during traditional family prayers and monastic pilgrimages.',
     festivalOccasions: ['Losar', 'Family Ceremonies'],
+    craftNotes: {
+      materials: ['Lightweight Organic Silk', 'Soft Cotton Lining'],
+      weavingTechnique: 'Breathable child-friendly handloom stitch',
+      producingRegion: 'Directorate of Handicrafts (Gangtok)',
+      originLore: 'Given to children during their first Losar celebration to receive elders’ blessings.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_DHH_GANGTOK],
   },
   {
     id: 'lepcha-men-thokro-dum',
@@ -238,8 +336,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 2.05,
     },
     culturalDescription:
-      'Handwoven white and maroon striped cotton fabric pinned across the left shoulder with a Gyaptuk belt.',
+      'Handwoven white and maroon striped cotton fabric pinned across the left shoulder and cinched with a Gyaptuk belt, honoring the indigenous forest lore of Mount Tendong.',
     festivalOccasions: ['Tendong Lho Rum Faat', 'Namsoong (Lepcha New Year)'],
+    craftNotes: {
+      materials: ['Indigenous Himalayan Nettle Fibre (Sisnu)', 'Organic Cotton', 'Vegetable Dyes'],
+      weavingTechnique: 'Traditional loin loom warp-faced weave',
+      producingRegion: 'Dzongu Indigenous Reserve & Lingthem (Mangan)',
+      originLore: 'Commemorates the flood legend of Tendong Hill where indigenous Lepcha ancestors were saved by sacred bamboo and hornbill spirits.',
+      preservationStatus: 'Rare Indigenous',
+    },
+    localVendors: [VENDOR_DZONGU_LEPCHA, VENDOR_DHH_GANGTOK],
     isFeatured: true,
   },
   {
@@ -263,8 +369,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 2.1,
     },
     culturalDescription:
-      'Ankle-length sage-green handwoven cotton wrap paired with a loose high-collared Tago blouse and vibrant Nyamrek sash.',
+      'Ankle-length sage-green handwoven cotton wrap paired with a loose high-collared Tago blouse and vibrant Nyamrek sash, celebrating the sacred flora of Kanchenjunga.',
     festivalOccasions: ['Namsoong (New Year)', 'Tendong Lho Rum Faat'],
+    craftNotes: {
+      materials: ['Hand-spun Cotton Yarn', 'Nettle Fibre Weave', 'Natural Bark Dyes'],
+      weavingTechnique: 'Loin loom seamless tubular wrap with embroidered selvedge',
+      producingRegion: 'Dzongu Weavers Guild & Mangan',
+      originLore: 'Inspired by the graceful bamboo reeds and mountain orchid blossoms of Teesta valley.',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_DZONGU_LEPCHA, VENDOR_PELLING_STUDIO],
     isFeatured: true,
   },
   {
@@ -290,6 +404,14 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
     culturalDescription:
       'Authentic miniature cross-body Lepcha handwoven weave with traditional diamond border embroidery for boys and girls.',
     festivalOccasions: ['Namsoong', 'Community Assemblies'],
+    craftNotes: {
+      materials: ['Pure Soft Cotton', 'Natural Dyes'],
+      weavingTechnique: 'Miniature loin loom diamond motif',
+      producingRegion: 'Dzongu Reserve (Mangan)',
+      originLore: 'Worn during ancestral folklore storytelling around the hearth.',
+      preservationStatus: 'Rare Indigenous',
+    },
+    localVendors: [VENDOR_DZONGU_LEPCHA],
   },
   {
     id: 'nepali-men-daura-suruwal-askot',
@@ -312,8 +434,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 2.05,
     },
     culturalDescription:
-      'Eight-string cross-tied pristine white cotton Daura tunic fitted with an embroidered black velvet Askot waistcoat and red Patuka sash.',
-    festivalOccasions: ['Dashain', 'Tihar', 'Bhanu Jayanti'],
+      'Eight-string cross-tied pristine white cotton Daura tunic fitted with an embroidered black velvet Askot waistcoat and red Patuka sash for formal state ceremonies.',
+    festivalOccasions: ['Dashain', 'Tihar', 'Bhanu Jayanti', 'Bagaicha'],
+    craftNotes: {
+      materials: ['100% Khadi Cotton', 'Micro-Velvet Askot', 'Brass Filigree Buttons'],
+      weavingTechnique: 'Eight-knot auspicious binding (representing Astamatrika deities)',
+      producingRegion: 'Namchi Handloom Cooperative & Rhenock Weavers',
+      originLore: 'Each of the eight ties signifies protection from the eight guardian directions according to Vedic-Himalayan folklore.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_DHH_GANGTOK],
     isFeatured: true,
   },
   {
@@ -337,8 +467,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 2.15,
     },
     culturalDescription:
-      'Deep magenta velvet cross-tied Cholo blouse paired with a vibrant red gold-printed Gunyu skirt and Patuka sash.',
+      'Deep magenta velvet cross-tied Cholo blouse paired with a vibrant red gold-printed Gunyu skirt and Patuka sash, marking auspicious occasions and weddings.',
     festivalOccasions: ['Dashain', 'Tihar', 'Teej', 'Weddings'],
+    craftNotes: {
+      materials: ['Embroidered Silk Velvet', 'Gold-leaf Printed Cotton', 'Handloom Red Patuka'],
+      weavingTechnique: 'Pleated flared fariya drape with reinforced waist gathering',
+      producingRegion: 'Namchi & Gangtok Artisan Clusters',
+      originLore: 'Presented during the coming-of-age ceremony (Gunyu Cholo Diyo) marking womanhood and cultural initiation.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_PELLING_STUDIO],
     isFeatured: true,
   },
   {
@@ -362,8 +500,16 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
       heightScaleRatio: 2.1,
     },
     culturalDescription:
-      'Traditional four-tied Chaubandi bodice paired with pleated performance skirt, celebrated across Sikkim during Maruni folk dances.',
+      'Traditional four-tied Chaubandi bodice paired with pleated performance skirt, celebrated across Sikkim during harvest dances and Maruni folk rituals.',
     festivalOccasions: ['Tihar', 'Maghe Sankranti', 'Maruni Celebrations'],
+    craftNotes: {
+      materials: ['Crimson Cotton Broadcloth', 'Handwoven Gold Zari Border'],
+      weavingTechnique: 'Four-string wrap with rhythmic dance pleats',
+      producingRegion: 'Namchi Central Weavers & Rhenock',
+      originLore: 'Worn by lead dancers in the historic Maruni dance depicting the victory of good over evil.',
+      preservationStatus: 'Heritage Preserved',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_DHH_GANGTOK],
   },
   {
     id: 'nepali-boy-junior-daura',
@@ -388,6 +534,14 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
     culturalDescription:
       'Classic scaled cotton Daura Suruwal tunic with miniature Dhaka printed waistcoat for boys during Dashain blessings.',
     festivalOccasions: ['Dashain Tika', 'Tihar'],
+    craftNotes: {
+      materials: ['Soft Washed Cotton', 'Dhaka Patterned Vest'],
+      weavingTechnique: 'Fitted miniature tailoring with soft inner seams',
+      producingRegion: 'Namchi Handloom Cooperative',
+      originLore: 'Worn when receiving rice Tika and Jamara blessings from family elders.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA],
   },
   {
     id: 'nepali-girl-junior-gunyu-cholo',
@@ -412,8 +566,17 @@ export const SIKKIM_GARMENT_WARDROBE: GarmentItem[] = [
     culturalDescription:
       'Miniature crimson and gold Gunyu Cholo with velvet bodice for young girls participating in cultural celebrations.',
     festivalOccasions: ['Teej', 'Dashain', 'School Cultural Days'],
+    craftNotes: {
+      materials: ['Ruby Velvet Bodice', 'Soft Printed Brocade Skirt'],
+      weavingTechnique: 'Scaled traditional pattern with flexible elasticated inner waistband',
+      producingRegion: 'Namchi & Gangtok Artisan Guilds',
+      originLore: 'Worn by young girls during festive folk performances across Sikkim.',
+      preservationStatus: 'Thriving',
+    },
+    localVendors: [VENDOR_NAMCHI_DHAKA, VENDOR_DHH_GANGTOK],
   },
 ];
+
 
 export type GarmentDefinition = GarmentItem;
 
