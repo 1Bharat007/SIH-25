@@ -224,12 +224,12 @@ export default function WardrobeSelector({
                     className="relative w-full aspect-[4/3] rounded-2xl bg-black/60 border border-white/10 overflow-hidden flex items-center justify-center p-3 cursor-pointer group"
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 pointer-events-none" />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.imageUrl}
                       alt={item.name}
                       className="w-full h-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300"
                     />
+
 
                     {isSelected && (
                       <div className="absolute top-2.5 right-2.5 bg-emerald-500 text-slate-950 p-1 rounded-full shadow-lg">

@@ -17,8 +17,21 @@ import {
   Sliders,
   Maximize2,
   Minimize2,
+  Layers,
+  HelpCircle,
+  X,
+  Compass,
+  Lightbulb,
 } from 'lucide-react';
-import { TEST_GARMENT_ITEM, GarmentDefinition } from '../../utils/garment-assets';
+import {
+  TEST_GARMENT_ITEM,
+  GarmentDefinition,
+  SIKKIM_HEADGEAR_CATALOG,
+  SIKKIM_LAYERS_CATALOG,
+  getCachedImage,
+  preloadAllWardrobeAssets,
+} from '../../utils/garment-assets';
+import { HeadgearItem, GarmentLayerItem } from '@sikkim-yatra/shared';
 
 interface ARTryOnStudioProps {
   customGarment?: GarmentDefinition;
@@ -45,6 +58,16 @@ interface SmoothedPoseState {
   initialized: boolean;
 }
 
+interface SmoothedHeadState {
+  headX: number;
+  headY: number;
+  angle: number;
+  width: number;
+  height: number;
+  confidence: number;
+  initialized: boolean;
+}
+
 export default function ARTryOnStudio({
   customGarment,
   onSnapshotCaptured,
@@ -54,7 +77,6 @@ export default function ARTryOnStudio({
   // DOM Refs
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const garmentImgRef = useRef<HTMLImageElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
   // MediaPipe Landmarker Ref
@@ -70,6 +92,12 @@ export default function ARTryOnStudio({
   const [cameraFacing, setCameraFacing] = useState<'user' | 'environment'>('user');
   const [isMirrored, setIsMirrored] = useState<boolean>(true);
   const [snapshotDataUrl, setSnapshotDataUrl] = useState<string | null>(null);
+
+  // Multi-Layer & Headgear Stack State
+  const [selectedHeadgear, setSelectedHeadgear] = useState<HeadgearItem | null>(null);
+  const [selectedLayer, setSelectedLayer] = useState<GarmentLayerItem | null>(null);
+  const [showLayersDrawer, setShowLayersDrawer] = useState<boolean>(false);
+  const [showPoseGuide, setShowPoseGuide] = useState<boolean>(false);
 
   // Fine-tuning adjustments (Manual scale / offset overrides)
   const [manualScale, setManualScale] = useState<number>(1.0);
@@ -90,15 +118,49 @@ export default function ARTryOnStudio({
     initialized: false,
   });
 
-  // Preload Garment Image
+  // Headgear Smoothing State (EMA)
+  const smoothedHeadRef = useRef<SmoothedHeadState>({
+    headX: 0,
+    headY: 0,
+    angle: 0,
+    width: 0,
+    height: 0,
+    confidence: 0,
+    initialized: false,
+  });
+
+  // Preload all wardrobe assets on mount for zero-flicker instant switching
   useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = garment.imageUrl;
-    img.onload = () => {
-      garmentImgRef.current = img;
-    };
-  }, [garment.imageUrl]);
+    preloadAllWardrobeAssets();
+  }, []);
+
+  // Set default matching layers/headgear when garment changes
+  useEffect(() => {
+    if (garment.community === 'Nepali') {
+      const defaultHat = SIKKIM_HEADGEAR_CATALOG.find((h) => h.id === 'headgear-nepali-dhaka-topi') || null;
+      setSelectedHeadgear(defaultHat);
+      if (garment.gender === 'male') {
+        const askot = SIKKIM_LAYERS_CATALOG.find((l) => l.id === 'layer-nepali-askot') || null;
+        setSelectedLayer(askot);
+      } else {
+        setSelectedLayer(null);
+      }
+    } else if (garment.community === 'Bhutia') {
+      const defaultHat = SIKKIM_HEADGEAR_CATALOG.find((h) => h.id === 'headgear-bhutia-gyalshom') || null;
+      setSelectedHeadgear(defaultHat);
+      if (garment.gender === 'female' && garment.categorySlug.includes('pangden')) {
+        const pangden = SIKKIM_LAYERS_CATALOG.find((l) => l.id === 'layer-bhutia-pangden') || null;
+        setSelectedLayer(pangden);
+      } else {
+        setSelectedLayer(null);
+      }
+    } else if (garment.community === 'Lepcha') {
+      const defaultHat = SIKKIM_HEADGEAR_CATALOG.find((h) => h.id === 'headgear-lepcha-sumbok') || null;
+      setSelectedHeadgear(defaultHat);
+      const sash = SIKKIM_LAYERS_CATALOG.find((l) => l.id === 'layer-lepcha-sash') || null;
+      setSelectedLayer(sash);
+    }
+  }, [garment]);
 
   // 1. Initialize MediaPipe Vision Task
   const initializeMediaPipe = useCallback(async () => {
@@ -108,12 +170,10 @@ export default function ARTryOnStudio({
 
       const { FilesetResolver, PoseLandmarker } = await import('@mediapipe/tasks-vision');
 
-      // Load WebAssembly binaries from CDN
       const vision = await FilesetResolver.forVisionTasks(
         'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
       );
 
-      // Create PoseLandmarker with GPU delegate and Video running mode
       const landmarker = await PoseLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath:
@@ -122,15 +182,15 @@ export default function ARTryOnStudio({
         },
         runningMode: 'VIDEO',
         numPoses: 1,
-        minPoseDetectionConfidence: 0.45,
-        minPosePresenceConfidence: 0.45,
-        minTrackingConfidence: 0.45,
+        minPoseDetectionConfidence: 0.4,
+        minPosePresenceConfidence: 0.4,
+        minTrackingConfidence: 0.4,
       });
 
       poseLandmarkerRef.current = landmarker;
       return landmarker;
     } catch (err: unknown) {
-      console.warn('[MediaPipe] GPU initialization error, retrying with CPU delegate:', err);
+      console.warn('[MediaPipe] GPU init failed, retrying with CPU delegate:', err);
       try {
         const { FilesetResolver, PoseLandmarker } = await import('@mediapipe/tasks-vision');
         const vision = await FilesetResolver.forVisionTasks(
@@ -144,13 +204,13 @@ export default function ARTryOnStudio({
           },
           runningMode: 'VIDEO',
           numPoses: 1,
-          minPoseDetectionConfidence: 0.4,
-          minPosePresenceConfidence: 0.4,
+          minPoseDetectionConfidence: 0.35,
+          minPosePresenceConfidence: 0.35,
         });
         poseLandmarkerRef.current = fallbackLandmarker;
         return fallbackLandmarker;
       } catch (cpuErr: unknown) {
-        const errorMsg = cpuErr instanceof Error ? cpuErr.message : 'Failed to initialize pose landmarker';
+        const errorMsg = cpuErr instanceof Error ? cpuErr.message : 'Failed to initialize vision engine';
         console.error('[MediaPipe] Fatal initialization error:', cpuErr);
         setStatus('error');
         setErrorMessage(`Vision Engine Init Error: ${errorMsg}`);
@@ -159,13 +219,15 @@ export default function ARTryOnStudio({
     }
   }, []);
 
-  // 2. Start Camera Feed
+  // 2. Start Camera Feed with Auto-Mirroring for Mobile
   const startCamera = useCallback(async () => {
     try {
       setStatus('requesting_camera');
       setErrorMessage(null);
 
-      // Stop existing tracks if any
+      // Auto mirror: selfie = mirrored, back camera = normal
+      setIsMirrored(cameraFacing === 'user');
+
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
@@ -189,11 +251,10 @@ export default function ARTryOnStudio({
       console.error('[Camera] Access error:', err);
       setStatus('camera_denied');
       setErrorMessage(
-        'Camera permission was denied or camera is currently unavailable. Please grant webcam access in your browser.'
+        'Camera permission was denied or unavailable. Please grant webcam access in browser settings.'
       );
     }
   }, [cameraFacing]);
-
 
   // 3. Real-Time Detection & Rendering Loop
   useEffect(() => {
@@ -208,7 +269,6 @@ export default function ARTryOnStudio({
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const landmarker = poseLandmarkerRef.current;
-      const garmentImg = garmentImgRef.current;
 
       if (
         video &&
@@ -218,7 +278,6 @@ export default function ARTryOnStudio({
         video.videoWidth > 0 &&
         video.videoHeight > 0
       ) {
-        // Adjust internal canvas resolution to match video feed
         if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
@@ -247,7 +306,7 @@ export default function ARTryOnStudio({
           ctx.drawImage(video, 0, 0, width, height);
           ctx.restore();
 
-          // Run MediaPipe PoseLandmarker inference when new frame arrives
+          // Run MediaPipe inference
           if (video.currentTime !== lastVideoTime) {
             lastVideoTime = video.currentTime;
             try {
@@ -257,9 +316,13 @@ export default function ARTryOnStudio({
                 const landmarks = results.landmarks[0];
 
                 // Extract Key Body Landmarks:
-                // 11: Left Shoulder, 12: Right Shoulder
-                // 23: Left Hip, 24: Right Hip
-                // 0: Nose (for head presence)
+                // 0: Nose, 2: Left Eye, 5: Right Eye, 7: Left Ear, 8: Right Ear
+                // 11: Left Shoulder, 12: Right Shoulder, 23: Left Hip, 24: Right Hip
+                const noseRaw = landmarks[0];
+                const leftEyeRaw = landmarks[2];
+                const rightEyeRaw = landmarks[5];
+                const leftEarRaw = landmarks[7];
+                const rightEarRaw = landmarks[8];
                 const leftShoulderRaw = landmarks[11];
                 const rightShoulderRaw = landmarks[12];
                 const leftHipRaw = landmarks[23];
@@ -277,16 +340,14 @@ export default function ARTryOnStudio({
 
                   const ls = { x: mapX(leftShoulderRaw.x), y: mapY(leftShoulderRaw.y) };
                   const rs = { x: mapX(rightShoulderRaw.x), y: mapY(rightShoulderRaw.y) };
-
                   const lh = leftHipRaw ? { x: mapX(leftHipRaw.x), y: mapY(leftHipRaw.y) } : null;
                   const rh = rightHipRaw ? { x: mapX(rightHipRaw.x), y: mapY(rightHipRaw.y) } : null;
 
-                  // Target Shoulder Midpoint & Hips Midpoint
+                  // Target Shoulder Midpoint
                   const targetNeckX = (ls.x + rs.x) / 2;
                   const targetNeckY = (ls.y + rs.y) / 2;
 
                   // Compute Orientation Angle (tilt of shoulders)
-                  // When mirrored, left vs right is reversed on screen
                   const dx = isMirrored ? ls.x - rs.x : rs.x - ls.x;
                   const dy = isMirrored ? ls.y - rs.y : rs.y - ls.y;
                   const targetAngle = Math.atan2(dy, dx);
@@ -307,8 +368,8 @@ export default function ARTryOnStudio({
                   const targetGarmentHeight =
                     torsoHeight * garment.anchorPoints.heightScaleRatio * manualScale;
 
-                  // Apply Temporal Smoothing (Exponential Moving Average)
-                  const alpha = 0.65; // Smoothing factor (0.0 = frozen, 1.0 = raw jerky)
+                  // Apply Temporal Smoothing (EMA)
+                  const alpha = 0.65;
                   const prev = smoothedPoseRef.current;
 
                   if (!prev.initialized) {
@@ -322,7 +383,7 @@ export default function ARTryOnStudio({
                   } else {
                     prev.neckX = prev.neckX * (1 - alpha) + targetNeckX * alpha;
                     prev.neckY = prev.neckY * (1 - alpha) + targetNeckY * alpha;
-                    // Angular interpolation
+
                     let angleDiff = targetAngle - prev.angle;
                     while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
                     while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
@@ -335,39 +396,142 @@ export default function ARTryOnStudio({
 
                   setConfidence(Math.round(prev.confidence * 100));
 
-                  // DRAW THE GARMENT OVERLAY
-                  if (garmentImg && garmentImg.complete) {
+                  // -----------------------------------------------------------
+                  // LAYER 1: BASE TRADITIONAL GARMENT
+                  // -----------------------------------------------------------
+                  const baseGarmentImg = getCachedImage(garment.imageUrl);
+                  if (baseGarmentImg && baseGarmentImg.complete) {
                     ctx.save();
-
-                    // Apply position translation with manual fine-tune offsets
                     ctx.translate(
                       prev.neckX + manualOffsetX,
                       prev.neckY + manualOffsetY
                     );
                     ctx.rotate(prev.angle);
 
-                    // Anchor calculation:
-                    // Align garment neck center at origin (0, 0)
                     const anchorOffsetX = -prev.width * garment.anchorPoints.neckCenterX;
                     const anchorOffsetY = -prev.height * garment.anchorPoints.neckCenterY;
 
-                    // Draw transformed garment
                     ctx.drawImage(
-                      garmentImg,
+                      baseGarmentImg,
                       anchorOffsetX,
                       anchorOffsetY,
                       prev.width,
                       prev.height
                     );
-
                     ctx.restore();
                   }
 
+                  // -----------------------------------------------------------
+                  // LAYER 2: SECONDARY WAISTCOAT / APRON / SASH OVERLAY
+                  // -----------------------------------------------------------
+                  if (selectedLayer) {
+                    const layerImg = getCachedImage(selectedLayer.imageUrl);
+                    if (layerImg && layerImg.complete) {
+                      ctx.save();
+                      ctx.translate(
+                        prev.neckX + manualOffsetX,
+                        prev.neckY + manualOffsetY
+                      );
+                      ctx.rotate(prev.angle);
+
+                      const layerWidth = shoulderDist * selectedLayer.anchorPoints.widthScaleRatio * manualScale;
+                      const layerHeight = torsoHeight * selectedLayer.anchorPoints.heightScaleRatio * manualScale;
+                      const anchorOffsetX = -layerWidth * selectedLayer.anchorPoints.neckCenterX;
+                      const anchorOffsetY = -layerHeight * selectedLayer.anchorPoints.neckCenterY;
+
+                      ctx.drawImage(
+                        layerImg,
+                        anchorOffsetX,
+                        anchorOffsetY,
+                        layerWidth,
+                        layerHeight
+                      );
+                      ctx.restore();
+                    }
+                  }
+
+                  // -----------------------------------------------------------
+                  // LAYER 3: TRADITIONAL HEADGEAR / CAP
+                  // -----------------------------------------------------------
+                  if (selectedHeadgear && (noseRaw || leftEarRaw || rightEarRaw || leftEyeRaw)) {
+                    const nose = noseRaw ? { x: mapX(noseRaw.x), y: mapY(noseRaw.y) } : null;
+                    const le = leftEarRaw ? { x: mapX(leftEarRaw.x), y: mapY(leftEarRaw.y) } : null;
+                    const re = rightEarRaw ? { x: mapX(rightEarRaw.x), y: mapY(rightEarRaw.y) } : null;
+                    const ley = leftEyeRaw ? { x: mapX(leftEyeRaw.x), y: mapY(leftEyeRaw.y) } : null;
+                    const rey = rightEyeRaw ? { x: mapX(rightEyeRaw.x), y: mapY(rightEyeRaw.y) } : null;
+
+                    const headCenterX = nose ? nose.x : (ls.x + rs.x) / 2;
+                    const eyeY = ley && rey ? (ley.y + rey.y) / 2 : (nose ? nose.y - shoulderDist * 0.4 : ls.y - shoulderDist * 0.6);
+                    
+                    // Head width based on ear span or shoulder ratio
+                    let headSpan = shoulderDist * 0.65;
+                    if (le && re) {
+                      headSpan = Math.hypot(re.x - le.x, re.y - le.y) * 1.35;
+                    }
+
+                    // Position headgear on forehead/crown
+                    const targetHeadY = eyeY - (headSpan * selectedHeadgear.anchorPoints.verticalHeadOffsetRatio);
+                    
+                    // Head angle tilt
+                    let targetHeadAngle = prev.angle;
+                    if (le && re) {
+                      const hdx = isMirrored ? le.x - re.x : re.x - le.x;
+                      const hdy = isMirrored ? le.y - re.y : re.y - le.y;
+                      targetHeadAngle = Math.atan2(hdy, hdx);
+                    }
+
+                    const targetHeadWidth = headSpan * selectedHeadgear.anchorPoints.widthScaleRatio * manualScale;
+                    const targetHeadHeight = (headSpan * 0.6) * selectedHeadgear.anchorPoints.heightScaleRatio * manualScale;
+
+                    // Smooth headgear coordinates
+                    const headAlpha = 0.7;
+                    const prevHead = smoothedHeadRef.current;
+                    if (!prevHead.initialized) {
+                      prevHead.headX = headCenterX;
+                      prevHead.headY = targetHeadY;
+                      prevHead.angle = targetHeadAngle;
+                      prevHead.width = targetHeadWidth;
+                      prevHead.height = targetHeadHeight;
+                      prevHead.initialized = true;
+                    } else {
+                      prevHead.headX = prevHead.headX * (1 - headAlpha) + headCenterX * headAlpha;
+                      prevHead.headY = prevHead.headY * (1 - headAlpha) + targetHeadY * headAlpha;
+                      
+                      let hAngleDiff = targetHeadAngle - prevHead.angle;
+                      while (hAngleDiff < -Math.PI) hAngleDiff += Math.PI * 2;
+                      while (hAngleDiff > Math.PI) hAngleDiff -= Math.PI * 2;
+                      prevHead.angle = prevHead.angle + hAngleDiff * headAlpha;
+
+                      prevHead.width = prevHead.width * (1 - headAlpha) + targetHeadWidth * headAlpha;
+                      prevHead.height = prevHead.height * (1 - headAlpha) + targetHeadHeight * headAlpha;
+                    }
+
+                    const headgearImg = getCachedImage(selectedHeadgear.imageUrl);
+                    if (headgearImg && headgearImg.complete) {
+                      ctx.save();
+                      ctx.translate(
+                        prevHead.headX + manualOffsetX,
+                        prevHead.headY + manualOffsetY
+                      );
+                      ctx.rotate(prevHead.angle);
+
+                      const hatOffsetX = -prevHead.width * selectedHeadgear.anchorPoints.crownCenterX;
+                      const hatOffsetY = -prevHead.height * selectedHeadgear.anchorPoints.crownCenterY;
+
+                      ctx.drawImage(
+                        headgearImg,
+                        hatOffsetX,
+                        hatOffsetY,
+                        prevHead.width,
+                        prevHead.height
+                      );
+                      ctx.restore();
+                    }
+                  }
 
                   // Optional Debug Skeleton Overlay
                   if (showDebugSkeleton) {
                     ctx.save();
-                    // Shoulder Line
                     ctx.strokeStyle = '#38bdf8';
                     ctx.lineWidth = 3;
                     ctx.beginPath();
@@ -375,46 +539,26 @@ export default function ARTryOnStudio({
                     ctx.lineTo(rs.x, rs.y);
                     ctx.stroke();
 
-                    // Landmark Dots
                     ctx.fillStyle = '#f59e0b';
                     ctx.beginPath();
                     ctx.arc(ls.x, ls.y, 6, 0, Math.PI * 2);
                     ctx.arc(rs.x, rs.y, 6, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Neck Center Point
                     ctx.fillStyle = '#10b981';
                     ctx.beginPath();
                     ctx.arc(prev.neckX, prev.neckY, 8, 0, Math.PI * 2);
                     ctx.fill();
-
-                    // Hips if detected
-                    if (lh && rh) {
-                      ctx.strokeStyle = '#a855f7';
-                      ctx.lineWidth = 2;
-                      ctx.beginPath();
-                      ctx.moveTo(lh.x, lh.y);
-                      ctx.lineTo(rh.x, rh.y);
-                      ctx.stroke();
-                    }
                     ctx.restore();
                   }
-
-                  if (status !== 'active_tracking') {
-                    setStatus('active_tracking');
-                  }
                 } else {
-                  // Low confidence detection
-                  setStatus('low_confidence');
-                  setConfidence(Math.round(shoulderConfidence * 100));
+                  setStatus('no_person_detected');
                 }
               } else {
-                // No pose detected in frame
                 setStatus('no_person_detected');
-                setConfidence(0);
               }
-            } catch (inferErr) {
-              console.warn('[Inference error]:', inferErr);
+            } catch {
+              // Frame dropped, continue next tick
             }
           }
         }
@@ -423,7 +567,7 @@ export default function ARTryOnStudio({
       animationFrameRef.current = requestAnimationFrame(renderLoop);
     };
 
-    animationFrameRef.current = requestAnimationFrame(renderLoop);
+    renderLoop();
 
     return () => {
       isRunning = false;
@@ -431,38 +575,27 @@ export default function ARTryOnStudio({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [
-    isMirrored,
-    showDebugSkeleton,
-    manualScale,
-    manualOffsetX,
-    manualOffsetY,
-    garment,
-    status,
-  ]);
+  }, [garment, selectedLayer, selectedHeadgear, isMirrored, manualScale, manualOffsetY, manualOffsetX, showDebugSkeleton]);
 
-  // Main Startup Effect
+  // Lifecycle initialization
   useEffect(() => {
     let mounted = true;
 
-    async function startup() {
+    async function setup() {
       const landmarker = await initializeMediaPipe();
       if (mounted && landmarker) {
         await startCamera();
       }
     }
 
-    startup();
+    setup();
 
     return () => {
       mounted = false;
       if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
-      }
-      if (poseLandmarkerRef.current) {
         try {
-          poseLandmarkerRef.current.close();
+          const stream = videoRef.current.srcObject as MediaStream;
+          stream.getTracks().forEach((track) => track.stop());
         } catch {
           // ignore
         }
@@ -525,17 +658,44 @@ export default function ARTryOnStudio({
             <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
               <span>Virtual AR Attire Studio</span>
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                MediaPipe Pose Engine
+                MediaPipe Multi-Layer
               </span>
             </h2>
             <p className="text-xs text-slate-400">
-              Live body-tracking & proportional garment fitting (Target 30+ FPS)
+              Live body tracking, proportional scaling & accessory layering (30+ FPS)
             </p>
           </div>
         </div>
 
         {/* Action Toolbar */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Pose Guide Hint */}
+          <button
+            onClick={() => setShowPoseGuide(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all"
+            title="How to pose for best tracking"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">Pose Guide</span>
+          </button>
+
+          {/* Layer Stacking Drawer Toggle */}
+          <button
+            onClick={() => setShowLayersDrawer(!showLayersDrawer)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+              showLayersDrawer || selectedHeadgear || selectedLayer
+                ? 'bg-teal-500/20 text-teal-300 border-teal-500/40 shadow-sm'
+                : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-white'
+            }`}
+            title="Toggle accessories & outer layers"
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Layers</span>
+            {(selectedHeadgear || selectedLayer) && (
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+            )}
+          </button>
+
           {/* Debug Skeleton Toggle */}
           <button
             onClick={() => setShowDebugSkeleton(!showDebugSkeleton)}
@@ -558,22 +718,22 @@ export default function ARTryOnStudio({
                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
                 : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-white'
             }`}
-            title="Mirror selfie video feed"
+            title="Mirror video feed"
           >
             <RotateCw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Mirror</span>
           </button>
 
-          {/* Camera Switcher (Front/Back) */}
+          {/* Mobile Camera Switcher (Front/Back) */}
           <button
             onClick={() => {
               setCameraFacing((prev) => (prev === 'user' ? 'environment' : 'user'));
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/60 text-slate-300 border border-slate-700/60 hover:bg-slate-800 hover:text-white transition-all"
-            title="Flip camera"
+            title="Flip camera (Front / Back)"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Flip</span>
+            <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">{cameraFacing === 'user' ? 'Front' : 'Back'}</span>
           </button>
 
           {/* Adjustments Slider Toggle */}
@@ -587,7 +747,7 @@ export default function ARTryOnStudio({
             title="Manual garment fine-tuning"
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Adjust</span>
+            <span className="hidden sm:inline">Fit</span>
           </button>
 
           {/* Fullscreen */}
@@ -600,6 +760,90 @@ export default function ARTryOnStudio({
           </button>
         </div>
       </div>
+
+      {/* Accessories & Stacking Layers Drawer */}
+      {showLayersDrawer && (
+        <div className="w-full mb-4 p-4 rounded-2xl bg-slate-900/90 border border-teal-500/30 space-y-4 animate-in fade-in duration-200">
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+            <div className="flex items-center gap-2 text-teal-300 font-bold text-xs">
+              <Layers className="w-4 h-4" />
+              <span>Multi-Piece Layer Stacking (Headgear & Outer Layers)</span>
+            </div>
+            <button
+              onClick={() => setShowLayersDrawer(false)}
+              className="text-xs text-slate-400 hover:text-white"
+            >
+              Close
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Traditional Headgear Selector */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Traditional Headgear (Layer 3)
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedHeadgear(null)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                    selectedHeadgear === null
+                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
+                      : 'bg-slate-950/60 text-slate-400 border-white/10 hover:text-white'
+                  }`}
+                >
+                  None
+                </button>
+                {SIKKIM_HEADGEAR_CATALOG.map((hat) => (
+                  <button
+                    key={hat.id}
+                    onClick={() => setSelectedHeadgear(hat)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                      selectedHeadgear?.id === hat.id
+                        ? 'bg-teal-500 text-slate-950 border-teal-400 font-bold shadow-md'
+                        : 'bg-slate-950/60 text-slate-300 border-white/10 hover:text-white'
+                    }`}
+                  >
+                    {hat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Secondary Outer Layer Selector */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Outer Layer / Sash (Layer 2)
+              </span>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedLayer(null)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                    selectedLayer === null
+                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
+                      : 'bg-slate-950/60 text-slate-400 border-white/10 hover:text-white'
+                  }`}
+                >
+                  None
+                </button>
+                {SIKKIM_LAYERS_CATALOG.map((layer) => (
+                  <button
+                    key={layer.id}
+                    onClick={() => setSelectedLayer(layer)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                      selectedLayer?.id === layer.id
+                        ? 'bg-purple-500 text-white border-purple-400 font-bold shadow-md'
+                        : 'bg-slate-950/60 text-slate-300 border-white/10 hover:text-white'
+                    }`}
+                  >
+                    {layer.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Viewport Container */}
       <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[640px] rounded-2xl bg-black border border-emerald-500/30 overflow-hidden shadow-inner flex items-center justify-center">
@@ -625,7 +869,7 @@ export default function ARTryOnStudio({
             <span className="font-mono font-bold text-white">{fps} FPS</span>
             <span className="text-white/40">|</span>
             <span className="text-white/70">Confidence:</span>
-            <span className={`font-mono font-bold ${confidence > 60 ? 'text-emerald-400' : 'text-amber-400'}`}>
+            <span className={`font-mono font-bold ${confidence > 55 ? 'text-emerald-400' : 'text-amber-400'}`}>
               {confidence}%
             </span>
           </div>
@@ -640,25 +884,30 @@ export default function ARTryOnStudio({
           {status === 'no_person_detected' && (
             <div className="flex items-center gap-1.5 bg-amber-950/80 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-amber-500/30 text-[10px] text-amber-300 font-semibold w-fit">
               <AlertTriangle className="w-3 h-3" />
-              <span>Step into camera view</span>
-            </div>
-          )}
-          {status === 'low_confidence' && (
-            <div className="flex items-center gap-1.5 bg-amber-950/80 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-amber-500/30 text-[10px] text-amber-300 font-semibold w-fit">
-              <Info className="w-3 h-3" />
-              <span>Adjust body / lighting</span>
+              <span>Step back into view</span>
             </div>
           )}
         </div>
 
-        {/* Active Garment Legend Badge */}
-        <div className="absolute top-3 right-3 z-20 pointer-events-none max-w-[220px]">
-          <div className="bg-slate-950/85 backdrop-blur-md p-2.5 rounded-xl border border-emerald-500/30 text-xs shadow-lg">
+        {/* Active Layers Stack Badge */}
+        <div className="absolute top-3 right-3 z-20 pointer-events-none max-w-[240px]">
+          <div className="bg-slate-950/85 backdrop-blur-md p-2.5 rounded-xl border border-emerald-500/30 text-xs shadow-lg space-y-1">
             <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
-              Active Garment
+              Active Outfit Stack
             </span>
-            <strong className="text-white text-xs block truncate">{garment.name}</strong>
-            <span className="text-[11px] text-slate-400 block truncate">{garment.community}</span>
+            <div className="text-white text-xs font-semibold truncate">
+              {garment.name}
+            </div>
+            {selectedLayer && (
+              <div className="text-[11px] text-purple-300 truncate">
+                + {selectedLayer.name}
+              </div>
+            )}
+            {selectedHeadgear && (
+              <div className="text-[11px] text-teal-300 truncate">
+                + {selectedHeadgear.name}
+              </div>
+            )}
           </div>
         </div>
 
@@ -672,11 +921,11 @@ export default function ARTryOnStudio({
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-white">
                 {status === 'loading_engine'
-                  ? 'Initializing MediaPipe Pose Engine (WASM + GPU)...'
-                  : 'Connecting to Webcam Feed...'}
+                  ? 'Initializing MediaPipe Pose & Vision Engine...'
+                  : 'Connecting to Camera Stream...'}
               </h3>
               <p className="text-xs text-slate-400 max-w-xs">
-                Preparing real-time 33-landmark pose detector for proportional garment overlay
+                Calibrating 33-point real-time pose detector for multi-layer wardrobe try-on
               </p>
             </div>
           </div>
@@ -692,12 +941,12 @@ export default function ARTryOnStudio({
               <h3 className="text-base font-bold text-white">Camera Access Required</h3>
               <p className="text-xs text-slate-300 leading-relaxed">
                 {errorMessage ||
-                  'The Virtual AR Try-On Studio requires webcam access to track shoulders and fit traditional garments in real time.'}
+                  'Webcam permission is needed to track your body posture and fit traditional attire in real time.'}
               </p>
             </div>
             <button
               onClick={startCamera}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center gap-2 cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Retry Camera Permission</span>
@@ -712,7 +961,7 @@ export default function ARTryOnStudio({
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5" />
-              <span>Garment Fitting Fine-Tuning (Real-Time Overrides)</span>
+              <span>Garment Fitting Fine-Tuning</span>
             </h4>
             <button
               onClick={() => {
@@ -722,15 +971,14 @@ export default function ARTryOnStudio({
               }}
               className="text-[10px] text-purple-300/80 hover:text-white underline"
             >
-              Reset to Defaults
+              Reset Defaults
             </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-            {/* Scale Slider */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-300">
-                <span>Scale Ratio:</span>
+                <span>Scale Multiplier:</span>
                 <span className="font-mono text-purple-300">{manualScale.toFixed(2)}x</span>
               </div>
               <input
@@ -744,7 +992,6 @@ export default function ARTryOnStudio({
               />
             </div>
 
-            {/* Vertical Offset Slider */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-300">
                 <span>Vertical Offset (Y):</span>
@@ -761,7 +1008,6 @@ export default function ARTryOnStudio({
               />
             </div>
 
-            {/* Horizontal Offset Slider */}
             <div className="space-y-1">
               <div className="flex justify-between text-[11px] text-slate-300">
                 <span>Horizontal Offset (X):</span>
@@ -783,11 +1029,10 @@ export default function ARTryOnStudio({
 
       {/* Bottom Action Controls */}
       <div className="w-full mt-4 flex flex-wrap items-center justify-between gap-4">
-        {/* Guidance Tips */}
         <div className="flex items-center gap-2 text-xs text-slate-400">
           <Info className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
-            Stand 1.5 – 2.5 meters from camera for full torso detection. The robe scales as you move.
+            Stand 1.5 – 2.5 meters away so shoulders and waist are visible. Garments scale dynamically as you move.
           </span>
         </div>
 
@@ -801,6 +1046,71 @@ export default function ARTryOnStudio({
           <span>Take AR Snapshot</span>
         </button>
       </div>
+
+      {/* "How to Pose" Onboarding Modal */}
+      {showPoseGuide && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-3xl border border-emerald-500/30 bg-slate-900 p-6 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-emerald-400" />
+                <h3 className="text-base font-bold text-white">How to Pose for Best AR Tracking</h3>
+              </div>
+              <button
+                onClick={() => setShowPoseGuide(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs text-slate-300">
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-white/10">
+                <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
+                  <Compass className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-white text-xs">1. Step Back for Full Upper Body</h4>
+                  <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
+                    Position your phone or webcam so your head, shoulders, and waist are clearly inside the camera frame (approx. 1.5 to 2.5 meters away).
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-white/10">
+                <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400 shrink-0">
+                  <Lightbulb className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-white text-xs">2. Frontal Natural Lighting</h4>
+                  <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
+                    Ensure adequate room light or face a window. Avoid dark rooms or bright backlight behind you.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-white/10">
+                <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400 shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-white text-xs">3. Relaxed Natural A-Pose</h4>
+                  <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
+                    Keep your shoulders level and your arms slightly relaxed away from your sides for the cleanest robe and sash alignment.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowPoseGuide(false)}
+              className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md"
+            >
+              Got It, Let&apos;s Try On!
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Snapshot Preview Modal */}
       {snapshotDataUrl && (
@@ -819,7 +1129,6 @@ export default function ARTryOnStudio({
               </button>
             </div>
 
-            {/* Photo Render */}
             <div className="rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[4/3] flex items-center justify-center">
               <img
                 src={snapshotDataUrl}
@@ -827,7 +1136,6 @@ export default function ARTryOnStudio({
                 className="w-full h-full object-contain"
               />
             </div>
-
 
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <button

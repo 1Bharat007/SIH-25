@@ -164,3 +164,32 @@ export interface GarmentFilterParams {
   search?: string;
 }
 
+export interface HeadgearAnchorPoints {
+  crownCenterX: number;
+  crownCenterY: number;
+  widthScaleRatio: number;
+  heightScaleRatio: number;
+  verticalHeadOffsetRatio: number; // Offset above eyes/ears line
+}
+
+export interface HeadgearItem {
+  id: string;
+  name: string;
+  nativeName?: string;
+  community: SikkimeseCommunity;
+  imageUrl: string;
+  anchorPoints: HeadgearAnchorPoints;
+  culturalLore: string;
+}
+
+export interface GarmentLayerItem {
+  id: string;
+  name: string;
+  layerType: 'outer_waistcoat' | 'apron' | 'sash' | 'shawl';
+  community: SikkimeseCommunity;
+  imageUrl: string;
+  anchorPoints: GarmentAnchorPoints;
+  culturalLore: string;
+}
+
+

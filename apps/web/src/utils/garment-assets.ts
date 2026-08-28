@@ -419,4 +419,268 @@ export type GarmentDefinition = GarmentItem;
 
 export const TEST_GARMENT_ITEM: GarmentItem = SIKKIM_GARMENT_WARDROBE[2] || SIKKIM_GARMENT_WARDROBE[0]!;
 
+// -----------------------------------------------------------------------------
+// TRADITIONAL HEADGEAR ASSETS & CALIBRATED ANCHORS
+// -----------------------------------------------------------------------------
+
+function createHeadgearSvgDataUri(type: 'dhaka_topi' | 'bhutia_hat' | 'lepcha_hat'): string {
+  let content = '';
+
+  switch (type) {
+    case 'dhaka_topi':
+      content = `
+        <!-- Traditional Nepali Dhaka Topi (Faceted woven cap) -->
+        <polygon points="50,180 150,40 350,40 450,180" fill="#991b1b" stroke="#0f172a" stroke-width="6"/>
+        <!-- Dhaka geometric weave patterns -->
+        <polygon points="100,160 170,60 330,60 400,160" fill="#0f172a"/>
+        <path d="M 120 160 L 250 80 L 380 160" fill="none" stroke="#eab308" stroke-width="8"/>
+        <circle cx="250" cy="110" r="16" fill="#eab308" stroke="#991b1b" stroke-width="3"/>
+        <rect x="50" y="170" width="400" height="20" rx="4" fill="#7f1d1d" stroke="#0f172a" stroke-width="4"/>
+      `;
+      break;
+
+    case 'bhutia_hat':
+      content = `
+        <!-- Traditional Bhutia Fur & Brocade Cap (Gyalshom) -->
+        <path d="M 90 180 C 90 80 170 30 250 30 C 330 30 410 80 410 180 Z" fill="#b91c1c" stroke="#78350f" stroke-width="6"/>
+        <!-- Gold Lotus Brocade Center -->
+        <circle cx="250" cy="110" r="28" fill="#f59e0b" stroke="#78350f" stroke-width="4"/>
+        <path d="M 235 110 Q 250 85 265 110 Q 250 135 235 110" fill="#dc2626"/>
+        <!-- Fur Side Flaps (Turned up) -->
+        <path d="M 60 190 Q 90 140 140 140 L 140 190 Z" fill="#d97706" stroke="#78350f" stroke-width="4"/>
+        <path d="M 440 190 Q 410 140 360 140 L 360 190 Z" fill="#d97706" stroke="#78350f" stroke-width="4"/>
+        <rect x="70" y="175" width="360" height="25" rx="8" fill="#f59e0b" stroke="#78350f" stroke-width="4"/>
+      `;
+      break;
+
+    case 'lepcha_hat':
+      content = `
+        <!-- Traditional Lepcha Bamboo Woven Feather Hat (Sumbok) -->
+        <ellipse cx="250" cy="170" rx="190" ry="40" fill="#d97706" stroke="#451a03" stroke-width="5"/>
+        <path d="M 120 165 C 130 90 180 50 250 50 C 320 50 370 90 380 165 Z" fill="#fbbf24" stroke="#78350f" stroke-width="5"/>
+        <!-- Bamboo Woven Grid -->
+        <path d="M 170 150 Q 250 70 330 150 M 200 160 Q 250 90 300 160" fill="none" stroke="#92400e" stroke-width="4"/>
+        <!-- Feather Ornament on Crown -->
+        <path d="M 250 50 Q 290 10 320 0 Q 300 25 255 45" fill="#047857" stroke="#064e3b" stroke-width="2"/>
+        <circle cx="250" cy="50" r="10" fill="#dc2626"/>
+      `;
+      break;
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 220" width="500" height="220">
+    <defs>
+      <filter id="headDrop" x="-10%" y="-10%" width="120%" height="120%">
+        <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.4"/>
+      </filter>
+    </defs>
+    <g filter="url(#headDrop)">
+      ${content}
+    </g>
+  </svg>`;
+
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+export const SIKKIM_HEADGEAR_CATALOG = [
+  {
+    id: 'headgear-nepali-dhaka-topi',
+    name: 'Traditional Nepali Dhaka Topi',
+    nativeName: 'ढाका टोपी',
+    community: 'Nepali' as const,
+    imageUrl: createHeadgearSvgDataUri('dhaka_topi'),
+    anchorPoints: {
+      crownCenterX: 0.5,
+      crownCenterY: 0.85,
+      widthScaleRatio: 1.25,
+      heightScaleRatio: 0.95,
+      verticalHeadOffsetRatio: 0.78,
+    },
+    culturalLore: 'Iconic geometric handwoven Dhaka cotton cap representing the mountain peaks of the Himalayas, worn tilted proudly during festivals.',
+  },
+  {
+    id: 'headgear-bhutia-gyalshom',
+    name: 'Bhutia Ceremonial Gyalshom Hat',
+    nativeName: 'རྒྱལ་ཞྭ (Gyal-Shom)',
+    community: 'Bhutia' as const,
+    imageUrl: createHeadgearSvgDataUri('bhutia_hat'),
+    anchorPoints: {
+      crownCenterX: 0.5,
+      crownCenterY: 0.88,
+      widthScaleRatio: 1.35,
+      heightScaleRatio: 1.05,
+      verticalHeadOffsetRatio: 0.82,
+    },
+    culturalLore: 'Traditional brocade silk and wool turned-ear cap worn during Losar celebrations and monastic festivals.',
+  },
+  {
+    id: 'headgear-lepcha-sumbok',
+    name: 'Lepcha Sumbok Bamboo Feather Hat',
+    nativeName: 'Sumbok (Rong Hat)',
+    community: 'Lepcha' as const,
+    imageUrl: createHeadgearSvgDataUri('lepcha_hat'),
+    anchorPoints: {
+      crownCenterX: 0.5,
+      crownCenterY: 0.85,
+      widthScaleRatio: 1.3,
+      heightScaleRatio: 1.0,
+      verticalHeadOffsetRatio: 0.8,
+    },
+    culturalLore: 'Woven split-bamboo dome adorned with natural forest plumage honoring indigenous Lepcha forest heritage.',
+  },
+];
+
+// -----------------------------------------------------------------------------
+// SECONDARY GARMENT LAYERS (OVERLAYS / SASHES / WAISTCOATS)
+// -----------------------------------------------------------------------------
+
+function createLayerSvgDataUri(type: 'bhutia_pangden' | 'nepali_askot' | 'lepcha_sash'): string {
+  let content = '';
+
+  switch (type) {
+    case 'bhutia_pangden':
+      content = `
+        <!-- Woven Wool Striped Pangden Apron with Gold Sash -->
+        <rect x="170" y="440" width="260" height="360" rx="8" fill="#f59e0b" stroke="#78350f" stroke-width="3"/>
+        <path d="M 170 470 L 430 470 M 170 500 L 430 500 M 170 530 L 430 530 M 170 560 L 430 560 M 170 590 L 430 590 M 170 620 L 430 620 M 170 650 L 430 650 M 170 680 L 430 680 M 170 710 L 430 710 M 170 740 L 430 740 M 170 770 L 430 770" stroke="#dc2626" stroke-width="10"/>
+        <!-- Golden Waist Tie -->
+        <rect x="130" y="425" width="340" height="35" rx="8" fill="#d97706" stroke="#78350f" stroke-width="2.5"/>
+        <circle cx="300" cy="442" r="16" fill="#78350f" stroke="#fef08a" stroke-width="3"/>
+      `;
+      break;
+
+    case 'nepali_askot':
+      content = `
+        <!-- Embroidered Black Velvet Askot Waistcoat -->
+        <path d="M 230 125 L 145 165 L 155 470 L 250 480 L 260 200 L 340 200 L 350 480 L 445 470 L 455 165 L 370 125 Z" fill="#0f172a" stroke="#f59e0b" stroke-width="3.5"/>
+        <!-- Brass Filigree Buttons -->
+        <circle cx="300" cy="240" r="6" fill="#fbbf24" stroke="#78350f" stroke-width="1.5"/>
+        <circle cx="300" cy="290" r="6" fill="#fbbf24" stroke="#78350f" stroke-width="1.5"/>
+        <circle cx="300" cy="340" r="6" fill="#fbbf24" stroke="#78350f" stroke-width="1.5"/>
+        <circle cx="300" cy="390" r="6" fill="#fbbf24" stroke="#78350f" stroke-width="1.5"/>
+        <circle cx="300" cy="440" r="6" fill="#fbbf24" stroke="#78350f" stroke-width="1.5"/>
+      `;
+      break;
+
+    case 'lepcha_sash':
+      content = `
+        <!-- Lepcha Diagonal Bamboo Gyaptuk Sash & Shoulder Drape -->
+        <path d="M 140 160 L 470 540 L 410 540 L 140 220 Z" fill="#dc2626" opacity="0.9" stroke="#991b1b" stroke-width="2"/>
+        <path d="M 140 240 L 410 570 L 350 570 L 140 300 Z" fill="#eab308" opacity="0.9"/>
+        <rect x="140" y="460" width="320" height="40" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+        <circle cx="300" cy="480" r="16" fill="#f59e0b" stroke="#78350f" stroke-width="2"/>
+      `;
+      break;
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 850" width="600" height="850">
+    <defs>
+      <filter id="layerDrop" x="-10%" y="-10%" width="120%" height="120%">
+        <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.35"/>
+      </filter>
+    </defs>
+    <g filter="url(#layerDrop)">
+      ${content}
+    </g>
+  </svg>`;
+
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+export const SIKKIM_LAYERS_CATALOG = [
+  {
+    id: 'layer-bhutia-pangden',
+    name: 'Bhutia Woven Pangden Apron',
+    layerType: 'apron' as const,
+    community: 'Bhutia' as const,
+    imageUrl: createLayerSvgDataUri('bhutia_pangden'),
+    anchorPoints: {
+      neckCenterX: 0.5,
+      neckCenterY: 0.14,
+      leftShoulderX: 0.22,
+      leftShoulderY: 0.18,
+      rightShoulderX: 0.78,
+      rightShoulderY: 0.18,
+      waistCenterY: 0.53,
+      widthScaleRatio: 1.8,
+      heightScaleRatio: 2.15,
+    },
+    culturalLore: 'Three-striped vibrant wool apron traditionally tied around the waist by married Bhutia women.',
+  },
+  {
+    id: 'layer-nepali-askot',
+    name: 'Nepali Velvet Askot Waistcoat',
+    layerType: 'outer_waistcoat' as const,
+    community: 'Nepali' as const,
+    imageUrl: createLayerSvgDataUri('nepali_askot'),
+    anchorPoints: {
+      neckCenterX: 0.5,
+      neckCenterY: 0.14,
+      leftShoulderX: 0.23,
+      leftShoulderY: 0.18,
+      rightShoulderX: 0.77,
+      rightShoulderY: 0.18,
+      waistCenterY: 0.55,
+      widthScaleRatio: 1.75,
+      heightScaleRatio: 2.05,
+    },
+    culturalLore: 'Fitted black velvet waistcoat with golden brass buttons layered over the Daura tunic.',
+  },
+  {
+    id: 'layer-lepcha-sash',
+    name: 'Lepcha Ceremonial Gyaptuk Sash',
+    layerType: 'sash' as const,
+    community: 'Lepcha' as const,
+    imageUrl: createLayerSvgDataUri('lepcha_sash'),
+    anchorPoints: {
+      neckCenterX: 0.5,
+      neckCenterY: 0.14,
+      leftShoulderX: 0.23,
+      leftShoulderY: 0.18,
+      rightShoulderX: 0.77,
+      rightShoulderY: 0.18,
+      waistCenterY: 0.54,
+      widthScaleRatio: 1.75,
+      heightScaleRatio: 2.05,
+    },
+    culturalLore: 'Traditional diagonal crimson and gold shoulder drape and woven waist belt.',
+  },
+];
+
+// -----------------------------------------------------------------------------
+// INSTANT IN-MEMORY IMAGE PRELOADER CACHE
+// -----------------------------------------------------------------------------
+
+const inMemoryImageCache = new Map<string, HTMLImageElement>();
+
+export function getCachedImage(url: string): HTMLImageElement {
+  let img = inMemoryImageCache.get(url);
+  if (!img) {
+    img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = url;
+    inMemoryImageCache.set(url, img);
+  }
+  return img;
+}
+
+export function preloadAllWardrobeAssets(): void {
+  if (typeof window === 'undefined') return;
+
+  // Preload all 12 garments
+  SIKKIM_GARMENT_WARDROBE.forEach((item) => {
+    getCachedImage(item.imageUrl);
+  });
+
+  // Preload all headgears
+  SIKKIM_HEADGEAR_CATALOG.forEach((item) => {
+    getCachedImage(item.imageUrl);
+  });
+
+  // Preload all secondary layers
+  SIKKIM_LAYERS_CATALOG.forEach((item) => {
+    getCachedImage(item.imageUrl);
+  });
+}
+
+
 
