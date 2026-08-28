@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShieldAlert } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import SOSModal from './SOSModal';
 
 export default function FloatingSOSButton() {
@@ -9,17 +9,14 @@ export default function FloatingSOSButton() {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-[9990]">
+      <div className="fixed bottom-5 right-5 z-[9990]">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="group relative flex items-center gap-2 rounded-full border-2 border-rose-400 bg-gradient-to-r from-rose-600 to-red-700 px-4 py-3.5 text-white shadow-2xl shadow-rose-950/80 transition-all hover:scale-105 active:scale-95 hover:from-rose-500 hover:to-red-600 focus:outline-none focus:ring-4 focus:ring-rose-500/50"
+          className="flex items-center gap-2 rounded-full border border-[#FAD2CF] bg-[#D93025] hover:bg-[#C5221F] px-4 py-2.5 text-[#FFFFFF] shadow-[0_2px_6px_0_rgba(60,64,67,0.3)] transition-colors focus:outline-none focus:ring-2 focus:ring-[#D93025] cursor-pointer"
           aria-label="Emergency SOS Trigger"
         >
-          {/* Animated Pulse Halo */}
-          <span className="absolute -inset-1 -z-10 animate-ping rounded-full bg-rose-600/40 opacity-75 duration-1000" />
-
-          <ShieldAlert className="h-5 w-5 animate-pulse text-white" />
-          <span className="text-xs font-black uppercase tracking-wider">SOS</span>
+          <AlertCircle className="h-4 w-4 text-[#FFFFFF]" />
+          <span className="text-[13px] font-medium tracking-wide">Emergency SOS</span>
         </button>
       </div>
 

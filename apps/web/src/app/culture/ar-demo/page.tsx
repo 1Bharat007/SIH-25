@@ -4,12 +4,13 @@ import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
-  Sparkles,
   Camera,
   Layers,
   Shirt,
   Compass,
   HeartHandshake,
+  CheckCircle2,
+  Cpu,
 } from 'lucide-react';
 
 import ARTryOnStudio from '../../../components/culture/ARTryOnStudio';
@@ -29,84 +30,68 @@ export default function ARDemoPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <main className="min-h-screen bg-[#F8F9FA] text-[#202124] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Navigation Breadcrumb */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <Link
-            href="/culture"
-            className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Cultural Heritage Hub</span>
-          </Link>
+        <div className="flex flex-wrap items-center justify-between gap-3 text-[12px] text-[#5F6368]">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="text-[#0B3D91] hover:underline font-medium flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Portal Overview</span>
+            </Link>
+            <span>/</span>
+            <Link href="/culture" className="text-[#0B3D91] hover:underline font-medium">
+              Cultural Heritage
+            </Link>
+            <span>/</span>
+            <span className="text-[#202124] font-medium">AR Attire Studio</span>
+          </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>MediaPipe Pose & Multi-Layer Vision Engine (30+ FPS)</span>
+          <div className="flex items-center gap-2 bg-[#FFFFFF] px-2.5 py-1 rounded-full border border-[#DADCE0] text-[11px]">
+            <Cpu className="w-3.5 h-3.5 text-[#1A73E8]" />
+            <span className="text-[#5F6368]">Engine: MediaPipe WASM/GPU (30+ FPS)</span>
           </div>
         </div>
 
-        {/* Hero Intro Screen: Heritage & Living Culture Mission */}
-        <div className="relative rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/40 via-slate-900/80 to-slate-950 p-6 sm:p-8 backdrop-blur-2xl shadow-2xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="relative z-10 space-y-4 max-w-4xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Virtual Cultural Heritage Studio</span>
-              </span>
-              <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                Bhutia • Lepcha • Nepali
-              </span>
-              <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                100% Client-Side Privacy
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Wear Sikkim’s Living Heritage in Real-Time AR
-            </h1>
-
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Step beyond simple social filters. Try on authentic traditional attire from Sikkim’s indigenous communities,
-              explore deep cultural symbolism & weaving craftsmanship, and connect directly with certified local weavers and artisan rental hubs across Sikkim.
-            </p>
-
-            {/* Quick Feature Pillars */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              <div className="p-3 rounded-2xl bg-slate-950/60 border border-white/5">
-                <div className="text-base font-bold text-white">12 Outfits</div>
-                <div className="text-[11px] text-slate-400">Authentic community wear</div>
-              </div>
-              <div className="p-3 rounded-2xl bg-slate-950/60 border border-white/5">
-                <div className="text-base font-bold text-teal-400">3-Layer Stack</div>
-                <div className="text-[11px] text-slate-400">Robes, sashes & headgear</div>
-              </div>
-              <div className="p-3 rounded-2xl bg-slate-950/60 border border-white/5">
-                <div className="text-base font-bold text-purple-400">Postcard Share</div>
-                <div className="text-[11px] text-slate-400">Organic tourism promotion</div>
-              </div>
-              <div className="p-3 rounded-2xl bg-slate-950/60 border border-white/5">
-                <div className="text-base font-bold text-emerald-400">Local Economy</div>
-                <div className="text-[11px] text-slate-400">Direct artisan booking</div>
-              </div>
-            </div>
+        {/* Section Header Card */}
+        <div className="bg-[#FFFFFF] border border-[#DADCE0] rounded-[8px] p-5 sm:p-6 space-y-3 shadow-[0_1px_2px_0_rgba(60,64,67,0.08)]">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#E8F0FE] text-[#1A73E8] border border-[#D2E3FC]">
+              Virtual Attire Simulator
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#E6F4EA] text-[#137333] border border-[#CEEAD6]">
+              Bhutia • Lepcha • Nepali
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#F8F9FA] text-[#5F6368] border border-[#DADCE0]">
+              100% Client-Side Privacy
+            </span>
           </div>
+
+          <h1 className="text-[22px] leading-[28px] font-medium text-[#202124]">
+            Traditional Sikkimese AR Attire Studio
+          </h1>
+
+          <p className="text-[14px] leading-[20px] text-[#5F6368] max-w-4xl">
+            Experience authentic traditional attire from Sikkim’s indigenous communities.
+            The system tracks your posture in real-time, adjusts garment proportions dynamically,
+            and links each outfit with certified local handloom weavers and rental clusters across Sikkim.
+          </p>
         </div>
 
-        {/* Main AR Studio & Cultural Context Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Live Core AR Camera Viewport (7 cols) */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="flex items-center justify-between px-1">
-              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                <Camera className="w-4 h-4 text-emerald-400" />
+        {/* Studio & Cultural Context Split Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left: Core AR Camera Mirror Viewport (7 Cols) */}
+          <div className="lg:col-span-7 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[15px] font-medium text-[#202124] flex items-center gap-2">
+                <Camera className="w-4 h-4 text-[#0B3D91]" />
                 <span>Live Interactive AR Mirror</span>
               </h2>
-              <span className="text-xs text-emerald-400 font-semibold truncate max-w-[220px]">
-                Active: {selectedGarment.name}
+              <span className="text-[12px] font-medium text-[#0B3D91] bg-[#E8F0FE] px-2 py-0.5 rounded-full border border-[#D2E3FC]">
+                {selectedGarment.name}
               </span>
             </div>
 
@@ -117,15 +102,15 @@ export default function ARDemoPage() {
             />
           </div>
 
-          {/* Right Column: Cultural Lore & Local Artisan Shop Panel (5 cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="flex items-center justify-between px-1">
-              <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                <Compass className="w-4 h-4 text-teal-400" />
+          {/* Right: Cultural Lore & Local Artisan Shop Details (5 Cols) */}
+          <div className="lg:col-span-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[15px] font-medium text-[#202124] flex items-center gap-2">
+                <Compass className="w-4 h-4 text-[#0B3D91]" />
                 <span>Cultural Context & Artisans</span>
               </h2>
-              <span className="text-xs text-slate-400">
-                Indigenous Craftsmanship
+              <span className="text-[11px] text-[#5F6368]">
+                Verified Heritage
               </span>
             </div>
 
@@ -138,22 +123,24 @@ export default function ARDemoPage() {
           </div>
         </div>
 
-        {/* Traditional Wardrobe Selector Section */}
-        <div className="space-y-4 pt-4 border-t border-white/10">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* 12-Outfit Wardrobe Selector Section */}
+        <div className="bg-[#FFFFFF] border border-[#DADCE0] rounded-[8px] p-5 sm:p-6 space-y-4 shadow-[0_1px_2px_0_rgba(60,64,67,0.08)]">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#DADCE0] pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-2.5 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                <Shirt className="w-5 h-5" />
+              <div className="p-2 rounded-[4px] bg-[#E8F0FE] text-[#0B3D91]">
+                <Shirt className="w-4 h-4" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Browse 12-Outfit Sikkimese Wardrobe</h2>
-                <p className="text-xs text-slate-400">
-                  Select any attire to instantly try on and view its indigenous heritage lore
+                <h2 className="text-[16px] font-medium text-[#202124]">
+                  Browse 12-Outfit Traditional Wardrobe
+                </h2>
+                <p className="text-[12px] text-[#5F6368]">
+                  Select any attire to preview on your camera feed and view authenticated weaving notes.
                 </p>
               </div>
             </div>
-            <span className="text-xs font-semibold text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-500/30">
-              Zero-Flicker Preloaded Assets
+            <span className="text-[11px] font-medium text-[#137333] bg-[#E6F4EA] px-2.5 py-1 rounded-full border border-[#CEEAD6]">
+              Instant In-Memory Switching
             </span>
           </div>
 
@@ -161,41 +148,46 @@ export default function ARDemoPage() {
             selectedGarmentId={selectedGarment.id}
             onSelectGarment={(garment) => {
               setSelectedGarment(garment);
-              window.scrollTo({ top: 180, behavior: 'smooth' });
+              window.scrollTo({ top: 120, behavior: 'smooth' });
             }}
           />
         </div>
 
-        {/* Technical Architecture & Economic Impact Deep-Dive */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4">
-          <div className="p-6 rounded-3xl bg-slate-900/60 border border-white/10 space-y-3">
-            <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 w-fit">
-              <Sparkles className="w-5 h-5" />
+        {/* Enterprise Technical & Socioeconomic Architecture */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-[#FFFFFF] border border-[#DADCE0] rounded-[8px] p-4 space-y-2">
+            <div className="w-8 h-8 rounded-[4px] bg-[#E8F0FE] text-[#1A73E8] flex items-center justify-center">
+              <Camera className="w-4 h-4" />
             </div>
-            <h3 className="font-bold text-sm text-white">Proportional Affine Transformation</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Dynamically maps Euclidean shoulder distance D(LS-RS) and torso length H(torso) to scale garments smoothly as users step closer or farther from the camera lens.
+            <h3 className="text-[14px] font-medium text-[#202124]">
+              Affine Proportional Tracking
+            </h3>
+            <p className="text-[12px] text-[#5F6368] leading-relaxed">
+              Dynamically scales width and height using Euclidean shoulder and torso anchors for smooth sizing as you step back.
             </p>
           </div>
 
-
-          <div className="p-6 rounded-3xl bg-slate-900/60 border border-white/10 space-y-3">
-            <div className="p-2.5 rounded-xl bg-teal-500/20 text-teal-400 w-fit">
-              <Layers className="w-5 h-5" />
+          <div className="bg-[#FFFFFF] border border-[#DADCE0] rounded-[8px] p-4 space-y-2">
+            <div className="w-8 h-8 rounded-[4px] bg-[#E8F0FE] text-[#1A73E8] flex items-center justify-center">
+              <Layers className="w-4 h-4" />
             </div>
-            <h3 className="font-bold text-sm text-white">Multi-Piece Independent Stacking</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Renders base robes, secondary sashes/aprons, and traditional caps (*Dhaka Topi, Gyalshom, Sumbok*) on independent anchor matrices with discrete EMA temporal smoothing.
+            <h3 className="text-[14px] font-medium text-[#202124]">
+              Multi-Layer Stacking Matrices
+            </h3>
+            <p className="text-[12px] text-[#5F6368] leading-relaxed">
+              Base robes, outer sashes/aprons, and traditional headgear (*Dhaka Topi, Gyalshom, Sumbok*) render with independent z-index coordinates.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-slate-900/60 border border-white/10 space-y-3">
-            <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400 w-fit">
-              <HeartHandshake className="w-5 h-5" />
+          <div className="bg-[#FFFFFF] border border-[#DADCE0] rounded-[8px] p-4 space-y-2">
+            <div className="w-8 h-8 rounded-[4px] bg-[#E6F4EA] text-[#1E8E3E] flex items-center justify-center">
+              <HeartHandshake className="w-4 h-4" />
             </div>
-            <h3 className="font-bold text-sm text-white">Local Artisan Economy Multiplier</h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Directly links virtual try-on items with verified government-certified weaving cooperatives (*DHH Gangtok, Dzongu Weavers, Namchi Dhaka*), converting tourists into local patrons.
+            <h3 className="text-[14px] font-medium text-[#202124]">
+              Local Artisan Economy Multiplier
+            </h3>
+            <p className="text-[12px] text-[#5F6368] leading-relaxed">
+              Directly links virtual outfits to verified cooperatives (*DHH Gangtok, Dzongu Weavers, Namchi Dhaka*) for tourism revenue generation.
             </p>
           </div>
         </div>

@@ -2,14 +2,12 @@
 
 import React, { useState } from 'react';
 import {
-  ShieldAlert,
   Radio,
   Plus,
   Trash2,
-  CheckCircle2,
-  RefreshCw,
   Send,
 } from 'lucide-react';
+
 import {
   DisasterAlert,
   CreateAlertPayload,
@@ -24,8 +22,8 @@ import {
 } from '../../services/disaster.service';
 
 interface AdminAlertManagerProps {
-  alerts: DisasterAlert[];
-  onAlertsChanged: () => void;
+  alerts?: DisasterAlert[];
+  onAlertsChanged?: () => void;
 }
 
 const SIKKIM_CORRIDOR_PRESETS = [
@@ -68,24 +66,11 @@ const SIKKIM_CORRIDOR_PRESETS = [
       'Sub-zero black ice. 4WD vehicles with snow chains only before 11:00 AM.',
     alternateRouteId: 'detour-north-lachen-valley-safe',
   },
-  {
-    name: 'Teesta River Basin (Singtam - Dikchu)',
-    district: 'Gangtok' as SikkimDistrict,
-    type: 'flash_flood' as DisasterType,
-    severity: 'high' as DisasterSeverity,
-    centerLat: 27.24,
-    centerLng: 88.5,
-    radiusKm: 8.0,
-    affectedCorridor: 'Teesta Riverbank Lowlands & Dikchu-Singtam Riparian Strip',
-    recommendedAction:
-      'Stay 150m away from Teesta river banks and bridges. Evacuate immediately if muddy silt surges.',
-    alternateRouteId: 'detour-nh10-pakyong-rorathang',
-  },
 ];
 
 export default function AdminAlertManager({
-  alerts,
-  onAlertsChanged,
+  alerts = [],
+  onAlertsChanged = () => {},
 }: AdminAlertManagerProps) {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -137,7 +122,7 @@ export default function AdminAlertManager({
       await createDisasterAlert(formData);
       setFeedbackMsg({
         type: 'success',
-        text: '🚨 Alert broadcasted successfully in real-time to all connected Sikkim travelers!',
+        text: 'Alert broadcasted successfully in real-time to all connected Sikkim travelers.',
       });
       setIsCreating(false);
       onAlertsChanged();
@@ -171,7 +156,7 @@ export default function AdminAlertManager({
         status: 'resolved',
         recommendedAction: 'Hazard resolved. Road cleared for normal tourist traffic.',
       });
-      setFeedbackMsg({ type: 'success', text: '✅ Alert marked as RESOLVED and broadcast updated.' });
+      setFeedbackMsg({ type: 'success', text: 'Alert marked as RESOLVED and broadcast updated.' });
       onAlertsChanged();
     } catch (err: unknown) {
       const error = err as Error;
@@ -192,339 +177,213 @@ export default function AdminAlertManager({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-white/10 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 rounded-[8px] bg-[#FFFFFF] border border-[#DADCE0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Radio className="w-5 h-5 text-red-400 animate-pulse" />
-            <h3 className="text-lg font-bold text-white">SSDMA / BRO Disaster Broadcast Console</h3>
+            <Radio className="w-4 h-4 text-[#0B3D91]" />
+            <h3 className="text-[15px] font-medium text-[#202124]">
+              SSDMA / BRO Disaster Broadcast Console
+            </h3>
           </div>
-          <p className="text-xs text-white/70 mt-1">
-            Admin console for publishing real-time hazard advisories, danger radius geofencing, and alternate bypass routes.
+          <p className="text-[12px] text-[#5F6368] mt-0.5">
+            Publish real-time mountain hazard advisories, danger radius geofencing, and alternate bypass routes.
           </p>
         </div>
 
         <button
           onClick={() => setIsCreating(!isCreating)}
-          className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2 border border-red-400/40"
+          className="px-3.5 py-1.5 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[12px] font-medium transition-colors flex items-center justify-center gap-1.5"
         >
-          <Plus className="w-4 h-4" />
-          <span>{isCreating ? 'Close Broadcast Form' : 'Broadcast New Hazard Alert'}</span>
+          <Plus className="w-3.5 h-3.5" />
+          <span>{isCreating ? 'Close Form' : 'Broadcast New Alert'}</span>
         </button>
       </div>
 
       {/* Feedback Toast */}
       {feedbackMsg && (
         <div
-          className={`p-4 rounded-xl text-xs font-semibold flex items-center justify-between border ${
+          className={`p-3 rounded-[4px] text-[12px] font-medium flex items-center justify-between border ${
             feedbackMsg.type === 'success'
-              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-200'
-              : 'bg-red-950/80 border-red-500/50 text-red-200'
+              ? 'bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]'
+              : 'bg-[#FCE8E6] text-[#C5221F] border-[#FAD2CF]'
           }`}
         >
           <span>{feedbackMsg.text}</span>
-          <button onClick={() => setFeedbackMsg(null)} className="text-white/60 hover:text-white">
-            ✕
+          <button
+            onClick={() => setFeedbackMsg(null)}
+            className="text-[11px] underline ml-2"
+          >
+            Dismiss
           </button>
         </div>
       )}
 
-      {/* Broadcast Form */}
+      {/* Broadcast Creation Form */}
       {isCreating && (
         <form
           onSubmit={handleCreateSubmit}
-          className="p-6 rounded-2xl bg-slate-900/90 border border-red-500/40 shadow-2xl backdrop-blur-xl space-y-4 animate-fadeIn"
+          className="rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] p-5 shadow-sm space-y-4"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-white/10">
-            <h4 className="text-sm font-bold text-white flex items-center gap-2">
-              <ShieldAlert className="w-4 h-4 text-red-400" />
-              Compose Emergency Broadcast Advisory
+          <div className="flex items-center justify-between border-b border-[#DADCE0] pb-3">
+            <h4 className="text-[14px] font-medium text-[#202124]">
+              Create Emergency Broadcast Advisory
             </h4>
-            <span className="text-[11px] text-red-400 font-semibold bg-red-950/60 px-2 py-0.5 rounded border border-red-500/30">
-              ⚡ Real-time WebSocket Push
-            </span>
-          </div>
-
-          {/* Presets Strip */}
-          <div>
-            <span className="text-[11px] font-semibold text-white/60 uppercase tracking-wider block mb-1.5">
-              Quick Corridor Presets:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-[#5F6368]">Quick Presets:</span>
               {SIKKIM_CORRIDOR_PRESETS.map((preset) => (
                 <button
-                  type="button"
                   key={preset.name}
+                  type="button"
                   onClick={() => applyPreset(preset)}
-                  className="p-2 rounded-lg bg-black/40 hover:bg-black/60 border border-white/10 text-left transition-all hover:border-red-400"
+                  className="px-2 py-0.5 rounded-[4px] bg-[#F8F9FA] hover:bg-[#E8F0FE] text-[#0B3D91] border border-[#DADCE0] text-[11px] font-medium"
                 >
-                  <div className="font-bold text-xs text-white truncate">{preset.name}</div>
-                  <div className="text-[10px] text-white/50">{preset.district} • {preset.type}</div>
+                  {preset.name.split(' ')[0]}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Form Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12px]">
             <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">
-                Alert Title *
+              <label className="block font-medium text-[#5F6368] mb-1">
+                Advisory Headline *
               </label>
               <input
                 type="text"
                 required
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g. Severe Landslide on NH10 near 29th Mile"
-                className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-white text-xs placeholder-white/40 focus:outline-none focus:border-red-400"
+                placeholder="e.g. Landslide on NH10 29th Mile"
+                className="w-full h-10 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[13px] text-[#202124] focus:outline-none focus:border-[#0B3D91]"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">
-                Affected Mountain Corridor *
+              <label className="block font-medium text-[#5F6368] mb-1">
+                Affected Corridor *
               </label>
               <input
                 type="text"
                 required
                 value={formData.affectedCorridor}
                 onChange={(e) => setFormData({ ...formData, affectedCorridor: e.target.value })}
-                placeholder="e.g. NH10 Main Highway (Rangpo - Singtam)"
-                className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-white text-xs placeholder-white/40 focus:outline-none focus:border-red-400"
+                placeholder="e.g. NH10 Rangpo to Singtam"
+                className="w-full h-10 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[13px] text-[#202124] focus:outline-none focus:border-[#0B3D91]"
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">Hazard Type</label>
+              <label className="block font-medium text-[#5F6368] mb-1">
+                Hazard Type
+              </label>
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as DisasterType })}
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
+                className="w-full h-10 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[13px] text-[#202124] focus:outline-none focus:border-[#0B3D91]"
               >
-                <option value="landslide">Landslide</option>
-                <option value="flash_flood">Flash Flood / GLOF</option>
-                <option value="earthquake">Earthquake</option>
-                <option value="road_closure">Road Closure</option>
-                <option value="heavy_snowfall">Heavy Snowfall</option>
-                <option value="weather_warning">Weather Warning</option>
-                <option value="general_advisory">General Advisory</option>
+                <option value="landslide">Landslide / Rockfall</option>
+                <option value="flash_flood">Teesta Flash Flood / GLOF</option>
+                <option value="heavy_snowfall">Heavy Snowfall / Blizzard</option>
+                <option value="road_closure">Road Closure / Maintenance</option>
+                <option value="earthquake">Earthquake Tremor</option>
               </select>
             </div>
 
             <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">Severity</label>
+              <label className="block font-medium text-[#5F6368] mb-1">
+                Severity Level
+              </label>
               <select
                 value={formData.severity}
-                onChange={(e) =>
-                  setFormData({ ...formData, severity: e.target.value as DisasterSeverity })
-                }
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
+                onChange={(e) => setFormData({ ...formData, severity: e.target.value as DisasterSeverity })}
+                className="w-full h-10 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[13px] text-[#202124] focus:outline-none focus:border-[#0B3D91]"
               >
-                <option value="critical">Critical (Red Alert)</option>
-                <option value="high">High (Orange Warning)</option>
-                <option value="moderate">Moderate (Yellow Advisory)</option>
-                <option value="info">Info (Advisory)</option>
+                <option value="critical">Critical (Immediate Road Block)</option>
+                <option value="high">High (4WD / Snow Chains Only)</option>
+                <option value="moderate">Moderate (Expect 1-2 hr Delays)</option>
+                <option value="low">Low (Precautionary Advisory)</option>
               </select>
             </div>
 
-            <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">District</label>
-              <select
-                value={formData.district}
-                onChange={(e) =>
-                  setFormData({ ...formData, district: e.target.value as SikkimDistrict })
-                }
-                className="w-full px-3 py-2 rounded-xl bg-slate-800 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
-              >
-                <option value="Gangtok">Gangtok</option>
-                <option value="Mangan">Mangan (North)</option>
-                <option value="Namchi">Namchi (South)</option>
-                <option value="Gyalshing">Gyalshing (West)</option>
-                <option value="Pakyong">Pakyong</option>
-                <option value="Soreng">Soreng</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">
-                Radius: <strong className="text-amber-400">{formData.radiusKm} km</strong>
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="25"
-                step="0.5"
-                value={formData.radiusKm}
-                onChange={(e) => setFormData({ ...formData, radiusKm: Number(e.target.value) })}
-                className="w-full mt-2 accent-red-500"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">
-                Latitude & Longitude (GPS Center)
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  step="0.0001"
-                  value={formData.centerLat}
-                  onChange={(e) => setFormData({ ...formData, centerLat: Number(e.target.value) })}
-                  className="w-1/2 px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
-                  placeholder="Lat"
-                />
-                <input
-                  type="number"
-                  step="0.0001"
-                  value={formData.centerLng}
-                  onChange={(e) => setFormData({ ...formData, centerLng: Number(e.target.value) })}
-                  className="w-1/2 px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
-                  placeholder="Lng"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[11px] font-semibold text-white/70 block mb-1">
-                Linked Alternate Detour Route ID (optional)
+            <div className="sm:col-span-2">
+              <label className="block font-medium text-[#5F6368] mb-1">
+                Recommended Action & Traveler Advisory
               </label>
               <input
                 type="text"
-                value={formData.alternateRouteId || ''}
-                onChange={(e) => setFormData({ ...formData, alternateRouteId: e.target.value })}
-                placeholder="e.g. detour-nh10-pakyong-rorathang"
-                className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
+                value={formData.recommendedAction}
+                onChange={(e) => setFormData({ ...formData, recommendedAction: e.target.value })}
+                placeholder="e.g. Take Pakyong - Rorathang bypass route..."
+                className="w-full h-10 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[13px] text-[#202124] focus:outline-none focus:border-[#0B3D91]"
               />
             </div>
           </div>
 
-          <div>
-            <label className="text-[11px] font-semibold text-white/70 block mb-1">
-              Detailed Description
-            </label>
-            <textarea
-              rows={2}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Provide information on blockage extent, machinery on site, or weather forecast..."
-              className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] font-semibold text-white/70 block mb-1">
-              Recommended Traveler Safety Action
-            </label>
-            <input
-              type="text"
-              value={formData.recommendedAction}
-              onChange={(e) => setFormData({ ...formData, recommendedAction: e.target.value })}
-              placeholder="e.g. Divert via Pakyong - Rorathang bypass route immediately."
-              className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/20 text-white text-xs focus:outline-none focus:border-red-400"
-            />
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+          <div className="flex justify-end gap-2 pt-2 border-t border-[#DADCE0]">
             <button
               type="button"
               onClick={() => setIsCreating(false)}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold"
+              className="px-3 py-1.5 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[#5F6368] text-[12px] font-medium hover:bg-[#F8F9FA]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-bold shadow-lg flex items-center gap-2 disabled:opacity-50"
+              className="px-4 py-1.5 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[12px] font-medium flex items-center gap-1.5"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>{isSubmitting ? 'Broadcasting...' : 'Broadcast to All Active Users'}</span>
+              <span>{isSubmitting ? 'Transmitting...' : 'Broadcast Alert'}</span>
             </button>
           </div>
         </form>
       )}
 
-      {/* Active Broadcasts Table / Cards */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-white/10 shadow-xl space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-bold text-white flex items-center gap-2">
-            <Radio className="w-4 h-4 text-emerald-400" />
-            Live Broadcast Feed ({alerts.length} Total Hazards)
-          </h4>
-          <button
-            onClick={() => onAlertsChanged()}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white transition-colors"
-            title="Refresh feed"
+      {/* Active Broadcasts Management List */}
+      <div className="space-y-2.5">
+        {alerts.map((alert) => (
+          <div
+            key={alert.id}
+            className="p-3.5 rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] shadow-xs flex items-start justify-between gap-3 text-[13px]"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {alerts.map((alert) => (
-            <div
-              key={alert.id}
-              className={`p-4 rounded-xl border transition-all ${
-                alert.status === 'active'
-                  ? 'bg-black/30 border-white/10 text-white'
-                  : 'bg-black/15 border-white/5 text-white/60'
-              }`}
-            >
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="space-y-1 min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                        alert.status === 'active'
-                          ? 'bg-red-500/20 text-red-300 border border-red-500/40'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                      }`}
-                    >
-                      {alert.status.toUpperCase()}
-                    </span>
-
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-white/10 text-white/90">
-                      {alert.severity}
-                    </span>
-
-                    <span className="text-xs text-white/50">{alert.district} District</span>
-                    <span className="text-xs text-white/40">• Radius: {alert.radiusKm} km</span>
-                  </div>
-
-                  <h5 className="font-bold text-sm text-white">{alert.title}</h5>
-                  <p className="text-xs text-white/70 leading-relaxed">{alert.affectedCorridor}</p>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {alert.status === 'active' && (
-                    <button
-                      onClick={() => handleResolveAlert(alert.id)}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs font-semibold transition-colors flex items-center gap-1 border border-emerald-400/30"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Mark Resolved</span>
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => handleDeleteAlert(alert.id)}
-                    className="p-1.5 rounded-lg bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-500/30 transition-colors"
-                    title="Delete alert"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`px-2 py-0.2 rounded-full text-[10px] font-medium border ${
+                    alert.severity === 'critical' || alert.severity === 'high'
+                      ? 'bg-[#FCE8E6] text-[#C5221F] border-[#FAD2CF]'
+                      : 'bg-[#FEF7E0] text-[#B06000] border-[#FEEFC3]'
+                  }`}
+                >
+                  {alert.severity}
+                </span>
+                <span className="font-medium text-[#202124]">{alert.title}</span>
+                <span className="text-[11px] text-[#5F6368]">({alert.district})</span>
               </div>
+              <p className="text-[12px] text-[#5F6368]">{alert.affectedCorridor}</p>
             </div>
-          ))}
-        </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              {alert.status === 'active' && (
+                <button
+                  onClick={() => handleResolveAlert(alert.id)}
+                  className="px-2.5 py-1 rounded-[4px] border border-[#CEEAD6] bg-[#E6F4EA] text-[#137333] hover:bg-[#D2EBD9] text-[11px] font-medium"
+                >
+                  Mark Resolved
+                </button>
+              )}
+              <button
+                onClick={() => handleDeleteAlert(alert.id)}
+                className="p-1 rounded-[4px] text-[#5F6368] hover:text-[#D93025] hover:bg-[#FCE8E6]"
+                title="Delete alert"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

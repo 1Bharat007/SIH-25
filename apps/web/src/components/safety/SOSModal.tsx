@@ -2,14 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  ShieldAlert,
+  AlertCircle,
   X,
   Phone,
   MessageCircle,
   MapPin,
   Battery,
   CheckCircle2,
-  Share2,
   RefreshCw,
   Copy,
   Check,
@@ -17,7 +16,6 @@ import {
   Snowflake,
   Wrench,
   Compass,
-  AlertCircle,
   Shield,
 } from 'lucide-react';
 import { EmergencyDistressType, SOSDispatchResult } from '@sikkim-yatra/shared';
@@ -31,12 +29,11 @@ import {
 const EMERGENCY_TYPES: { type: EmergencyDistressType; icon: React.ElementType; label: string }[] = [
   { type: 'Medical Emergency', icon: HeartPulse, label: 'Medical Aid / Altitude Sickness' },
   { type: 'Stranded in Snow / Landslide', icon: Snowflake, label: 'Stranded (Snow / Landslide)' },
-  { type: 'Vehicle Breakdown', icon: Wrench, label: 'Vehicle Breakdown in Pass' },
+  { type: 'Vehicle Breakdown', icon: Wrench, label: 'Vehicle Breakdown in Mountain Pass' },
   { type: 'Lost in Mountain Trail', icon: Compass, label: 'Lost / Disoriented in Trail' },
   { type: 'Harassment / Security Threat', icon: Shield, label: 'Security / Harassment Threat' },
   { type: 'Other Emergency', icon: AlertCircle, label: 'General Emergency Distress' },
 ];
-
 
 interface SOSModalProps {
   isOpen: boolean;
@@ -72,10 +69,9 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
     let timer: NodeJS.Timeout;
     if (countdown !== null && countdown > 0) {
       timer = setTimeout(() => {
-        setCountdown(prev => (prev !== null ? prev - 1 : null));
+        setCountdown((prev) => (prev !== null ? prev - 1 : null));
       }, 1000);
     } else if (countdown === 0) {
-      // Trigger actual dispatch
       setCountdown(null);
       sosMutation.mutate(
         {
@@ -90,7 +86,7 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
           trustedContacts: contacts,
         },
         {
-          onSuccess: data => {
+          onSuccess: (data) => {
             setDispatchResult(data);
           },
         }
@@ -102,7 +98,7 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
   if (!isOpen) return null;
 
   const handleStartCountdown = () => {
-    setCountdown(3); // 3-second buffer to cancel
+    setCountdown(3);
   };
 
   const handleCancelCountdown = () => {
@@ -118,22 +114,19 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-rose-500/40 bg-[#0c0507] p-6 shadow-2xl text-white max-h-[90vh] overflow-y-auto">
-        {/* Background glow */}
-        <div className="pointer-events-none absolute -top-32 left-1/2 h-64 w-96 -translate-x-1/2 rounded-full bg-rose-600/20 blur-3xl" />
-
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#000000]/50 backdrop-blur-xs">
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] p-5 sm:p-6 shadow-2xl text-[#202124] max-h-[90vh] overflow-y-auto">
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between border-b border-rose-900/40 pb-4">
+        <div className="flex items-center justify-between border-b border-[#DADCE0] pb-3.5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-600 text-white shadow-lg shadow-rose-900/80 animate-pulse">
-              <ShieldAlert className="h-6 w-6" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-[4px] bg-[#FCE8E6] text-[#D93025]">
+              <AlertCircle className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-black tracking-tight text-white uppercase sm:text-xl">
+              <h2 className="text-[16px] font-medium text-[#202124]">
                 Emergency SOS Broadcast
               </h2>
-              <p className="text-xs text-rose-300/80">
+              <p className="text-[12px] text-[#5F6368]">
                 Sikkim State Disaster Response & Police Dispatch
               </p>
             </div>
@@ -141,7 +134,7 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
 
           <button
             onClick={onClose}
-            className="rounded-full p-2 text-rose-300 hover:bg-rose-950/60 transition-colors"
+            className="p-1 rounded-[4px] text-[#5F6368] hover:text-[#202124] hover:bg-[#F8F9FA]"
             title="Close SOS"
           >
             <X className="h-5 w-5" />
@@ -150,54 +143,51 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
 
         {/* Render Dispatch Result Confirmation if completed */}
         {dispatchResult ? (
-          <div className="mt-6 space-y-5">
-            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/40 p-5 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 mb-3">
-                <CheckCircle2 className="h-8 w-8" />
-              </div>
-              <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-300 border border-emerald-500/30">
-                SOS Broadcast Dispatched
-              </span>
-              <h3 className="mt-2 text-lg font-bold text-white">Emergency Response Alert Active</h3>
-              <p className="text-xs text-emerald-200/80 mt-1 font-mono">
+          <div className="mt-4 space-y-4">
+            <div className="rounded-[4px] border border-[#CEEAD6] bg-[#E6F4EA] p-4 text-center space-y-1">
+              <CheckCircle2 className="h-7 w-7 text-[#1E8E3E] mx-auto" />
+              <h3 className="text-[15px] font-medium text-[#137333]">
+                SOS Broadcast Dispatched Successfully
+              </h3>
+              <p className="text-[12px] text-[#137333] font-mono">
                 Confirmation ID: {dispatchResult.confirmationCode}
               </p>
             </div>
 
             {/* Nearest Dispatched Posts */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-rose-500/30 bg-rose-950/30 p-4">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">
-                  Primary Police Outpost ({dispatchResult.nearestPolice.distanceKm} km)
+              <div className="rounded-[4px] border border-[#DADCE0] bg-[#F8F9FA] p-3.5 space-y-2">
+                <span className="text-[11px] font-medium text-[#C5221F] bg-[#FCE8E6] px-2 py-0.5 rounded-full border border-[#FAD2CF]">
+                  Police ({dispatchResult.nearestPolice.distanceKm} km)
                 </span>
-                <h4 className="mt-1 text-sm font-bold text-white">
+                <h4 className="text-[13px] font-medium text-[#202124]">
                   {dispatchResult.nearestPolice.name}
                 </h4>
-                <p className="text-xs text-slate-300 mt-0.5">
+                <p className="text-[11px] text-[#5F6368]">
                   {dispatchResult.nearestPolice.address}
                 </p>
                 <a
                   href={`tel:${dispatchResult.nearestPolice.phone.replace(/[^0-9+]/g, '')}`}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-rose-600 py-2 text-xs font-bold text-white hover:bg-rose-500 transition-all shadow-md"
+                  className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-[4px] bg-[#D93025] py-2 text-[12px] font-medium text-[#FFFFFF] hover:bg-[#C5221F] transition-colors"
                 >
                   <Phone className="h-3.5 w-3.5" />
                   <span>Call Police ({dispatchResult.nearestPolice.phone})</span>
                 </a>
               </div>
 
-              <div className="rounded-2xl border border-teal-500/30 bg-teal-950/30 p-4">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400">
-                  Nearest Hospital ({dispatchResult.nearestHospital.distanceKm} km)
+              <div className="rounded-[4px] border border-[#DADCE0] bg-[#F8F9FA] p-3.5 space-y-2">
+                <span className="text-[11px] font-medium text-[#1A73E8] bg-[#E8F0FE] px-2 py-0.5 rounded-full border border-[#D2E3FC]">
+                  Hospital ({dispatchResult.nearestHospital.distanceKm} km)
                 </span>
-                <h4 className="mt-1 text-sm font-bold text-white">
+                <h4 className="text-[13px] font-medium text-[#202124]">
                   {dispatchResult.nearestHospital.name}
                 </h4>
-                <p className="text-xs text-slate-300 mt-0.5">
+                <p className="text-[11px] text-[#5F6368]">
                   {dispatchResult.nearestHospital.address}
                 </p>
                 <a
                   href={`tel:${dispatchResult.nearestHospital.phone.replace(/[^0-9+]/g, '')}`}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-teal-600 py-2 text-xs font-bold text-white hover:bg-teal-500 transition-all shadow-md"
+                  className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-[4px] bg-[#0B3D91] py-2 text-[12px] font-medium text-[#FFFFFF] hover:bg-[#082E6E] transition-colors"
                 >
                   <Phone className="h-3.5 w-3.5" />
                   <span>Call Hospital ({dispatchResult.nearestHospital.phone})</span>
@@ -206,17 +196,17 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
             </div>
 
             {/* Instant Messaging & Sharing */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 space-y-3">
+            <div className="rounded-[4px] border border-[#DADCE0] bg-[#F8F9FA] p-3.5 space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white">
+                <span className="text-[12px] font-medium text-[#202124]">
                   Trusted Contacts Notified ({contacts.length})
                 </span>
                 <button
                   onClick={handleCopySms}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300"
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-[#0B3D91] hover:underline"
                 >
-                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                  <span>{copied ? 'Copied' : 'Copy Emergency Text'}</span>
+                  {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  <span>{copied ? 'Copied' : 'Copy SOS Text'}</span>
                 </button>
               </div>
 
@@ -224,7 +214,7 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
                 href={dispatchResult.whatsappShareUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-emerald-600 py-3 text-xs font-bold text-white shadow-lg shadow-emerald-950/60 hover:bg-emerald-500 transition-all"
+                className="flex items-center justify-center gap-2 w-full rounded-[4px] bg-[#1E8E3E] py-2 text-[12px] font-medium text-[#FFFFFF] hover:bg-[#137333] transition-colors"
               >
                 <MessageCircle className="h-4 w-4" />
                 <span>Send Emergency GPS Location via WhatsApp</span>
@@ -233,26 +223,26 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
 
             <button
               onClick={onClose}
-              className="w-full rounded-2xl border border-slate-700 bg-slate-900 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800"
+              className="w-full rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] py-2 text-[12px] font-medium text-[#5F6368] hover:bg-[#F8F9FA]"
             >
               Close Emergency Window
             </button>
           </div>
         ) : (
           /* SOS Trigger Screen */
-          <div className="mt-5 space-y-5">
+          <div className="mt-4 space-y-4">
             {/* Live GPS & Device Telemetry Radar */}
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-950/20 p-4">
-              <div className="flex items-center justify-between border-b border-rose-900/30 pb-2 mb-3">
+            <div className="rounded-[4px] border border-[#DADCE0] bg-[#F8F9FA] p-3.5 space-y-2">
+              <div className="flex items-center justify-between border-b border-[#DADCE0] pb-2">
                 <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-rose-400" />
-                  <span className="text-xs font-bold text-rose-200">Live GPS Location</span>
-                  <span className="rounded bg-rose-500/20 px-1.5 py-0.2 text-[10px] font-semibold text-rose-300">
+                  <MapPin className="h-3.5 w-3.5 text-[#0B3D91]" />
+                  <span className="text-[12px] font-medium text-[#202124]">Live GPS Coordinates</span>
+                  <span className="rounded-full bg-[#E8F0FE] px-2 py-0.2 text-[10px] font-medium text-[#0B3D91] border border-[#D2E3FC]">
                     {gpsStatus}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-rose-300">
+                <div className="flex items-center gap-2 text-[11px] text-[#5F6368]">
                   {batteryLevel !== undefined && (
                     <div className="flex items-center gap-1">
                       <Battery className="h-3.5 w-3.5" />
@@ -261,7 +251,7 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
                   )}
                   <button
                     onClick={refreshLocation}
-                    className="hover:text-white"
+                    className="hover:text-[#202124]"
                     title="Refresh GPS"
                   >
                     <RefreshCw className="h-3.5 w-3.5" />
@@ -269,140 +259,103 @@ export default function SOSModal({ isOpen, onClose }: SOSModalProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-300 sm:grid-cols-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
                 <div>
-                  <span className="text-[10px] text-slate-500 block">Latitude</span>
-                  <span className="font-bold text-white">{coordinates.latitude.toFixed(5)}° N</span>
+                  <span className="text-[#5F6368] block">Latitude</span>
+                  <span className="font-medium text-[#202124]">{coordinates.latitude.toFixed(5)}° N</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 block">Longitude</span>
-                  <span className="font-bold text-white">
-                    {coordinates.longitude.toFixed(5)}° E
-                  </span>
+                  <span className="text-[#5F6368] block">Longitude</span>
+                  <span className="font-medium text-[#202124]">{coordinates.longitude.toFixed(5)}° E</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 block">Altitude</span>
-                  <span className="font-bold text-amber-300">
-                    {coordinates.altitudeMeters || 1650} m
-                  </span>
+                  <span className="text-[#5F6368] block">Altitude</span>
+                  <span className="font-medium text-[#B06000]">{coordinates.altitudeMeters || 1650} m</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 block">Accuracy</span>
-                  <span className="font-bold text-emerald-400">
-                    ±{coordinates.accuracyMeters || 15} m
-                  </span>
+                  <span className="text-[#5F6368] block">Accuracy</span>
+                  <span className="font-medium text-[#137333]">±{coordinates.accuracyMeters || 15} m</span>
                 </div>
               </div>
 
               {nearestEmergency && (
-                <div className="mt-3 rounded-xl bg-black/40 p-2.5 flex items-center justify-between text-xs border border-rose-900/40">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-rose-400 shrink-0" />
-                    <div>
-                      <span className="font-semibold text-white">
-                        {nearestEmergency.nearestPolice.name}
-                      </span>
-                      <span className="text-[11px] text-rose-300/80 block">
-                        Closest Police Station • {nearestEmergency.nearestPolice.distanceKm} km away
-                      </span>
-                    </div>
-                  </div>
-                  <a
-                    href={`tel:${nearestEmergency.nearestPolice.phone.replace(/[^0-9+]/g, '')}`}
-                    className="rounded-lg bg-rose-600/80 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-rose-500"
-                  >
-                    Call
-                  </a>
+                <div className="pt-2 border-t border-[#DADCE0] flex flex-wrap justify-between text-[11px] text-[#5F6368]">
+                  <span>Nearest Police: <strong className="text-[#202124]">{nearestEmergency.nearestPolice?.name || 'Sadar Police Post'}</strong> ({nearestEmergency.nearestPolice?.distanceKm ?? 1.2} km)</span>
+                  <span>Hospital: <strong className="text-[#202124]">{nearestEmergency.nearestHospital?.name || 'District Trauma Center'}</strong></span>
                 </div>
               )}
             </div>
 
-            {/* Emergency Type Selector */}
-            <div>
-              <label className="text-xs font-bold text-white mb-2 block">
-                Select Nature of Distress:
+
+
+            {/* Select Emergency Type */}
+            <div className="space-y-1.5">
+              <label className="block text-[12px] font-medium text-[#5F6368]">
+                Select Emergency Distress Category:
               </label>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {EMERGENCY_TYPES.map(item => {
-                  const Icon = item.icon;
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {EMERGENCY_TYPES.map((em) => {
+                  const isSelected = selectedType === em.type;
+                  const Icon = em.icon;
                   return (
                     <button
-                      key={item.type}
-                      onClick={() => setSelectedType(item.type)}
-                      className={`flex items-center gap-2.5 rounded-2xl border p-3 text-left transition-all ${
-                        selectedType === item.type
-                          ? 'border-rose-500 bg-rose-600/30 text-white shadow-md'
-                          : 'border-rose-900/30 bg-slate-950/40 text-slate-300 hover:bg-rose-950/30 hover:border-rose-700/50'
+                      key={em.type}
+                      type="button"
+                      onClick={() => setSelectedType(em.type)}
+                      className={`flex items-center gap-2.5 p-2.5 rounded-[4px] border text-left text-[12px] font-medium transition-colors ${
+                        isSelected
+                          ? 'border-[#D93025] bg-[#FCE8E6] text-[#C5221F]'
+                          : 'border-[#DADCE0] bg-[#FFFFFF] text-[#202124] hover:bg-[#F8F9FA]'
                       }`}
                     >
-                      <Icon className="h-4 w-4 text-rose-400 shrink-0" />
-                      <span className="text-xs font-semibold">{item.label}</span>
+                      <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#D93025]' : 'text-[#5F6368]'}`} />
+                      <span className="truncate">{em.label}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-
-            {/* Optional Distress Notes */}
-            <div>
-              <label className="text-xs font-semibold text-slate-300 mb-1.5 block">
-                Additional Notes / Landmarks (Optional):
+            {/* Optional Distress Note */}
+            <div className="space-y-1">
+              <label htmlFor="sos-notes" className="block text-[12px] font-medium text-[#5F6368]">
+                Optional Situation Details:
               </label>
               <input
+                id="sos-notes"
                 type="text"
                 value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="e.g. Near 13th Mile checkpost, 2 people with breathing difficulty..."
-                className="w-full rounded-2xl border border-rose-900/40 bg-slate-950/60 p-3 text-xs text-white placeholder-slate-500 focus:border-rose-500 focus:outline-none"
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="e.g. 2 passengers, flat tyre on North Sikkim highway..."
+                className="w-full h-10 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[13px] text-[#202124] placeholder-[#80868B] focus:outline-none focus:border-[#D93025]"
               />
             </div>
 
-            {/* Trusted Contacts Preview */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-3.5 text-xs text-slate-300 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Share2 className="h-4 w-4 text-emerald-400" />
-                <span>
-                  Emergency alert will also dispatch to{' '}
-                  <strong className="text-white">{contacts.length} Trusted Contacts</strong>
-                </span>
-              </div>
-            </div>
-
-            {/* Accidental Protection Countdown vs Trigger Button */}
+            {/* Countdown / Dispatch Action Button */}
             {countdown !== null ? (
-              <div className="rounded-2xl border border-rose-500 bg-rose-950/60 p-6 text-center space-y-3 animate-pulse">
-                <div className="text-4xl font-black text-rose-400">{countdown}</div>
-                <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-                  Broadcasting SOS in {countdown} Seconds...
-                </h4>
-                <p className="text-xs text-rose-200/80">
-                  Tap Cancel immediately if this was pressed by mistake
+              <div className="rounded-[4px] border border-[#FAD2CF] bg-[#FCE8E6] p-4 text-center space-y-2">
+                <p className="text-[14px] font-medium text-[#C5221F]">
+                  Broadcasting SOS in {countdown} seconds...
                 </p>
                 <button
+                  type="button"
                   onClick={handleCancelCountdown}
-                  className="rounded-2xl bg-white px-6 py-2.5 text-xs font-bold text-slate-950 hover:bg-slate-200 shadow-xl"
+                  className="px-4 py-2 rounded-[4px] bg-[#FFFFFF] border border-[#DADCE0] text-[#202124] text-[12px] font-medium hover:bg-[#F8F9FA]"
                 >
-                  CANCEL SOS BROADCAST
+                  Cancel Trigger
                 </button>
               </div>
             ) : (
               <button
+                type="button"
                 onClick={handleStartCountdown}
                 disabled={sosMutation.isPending}
-                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-gradient-to-r from-rose-600 via-red-600 to-rose-700 py-4 text-sm font-black text-white uppercase tracking-wider shadow-2xl shadow-rose-900/90 hover:from-rose-500 hover:to-red-500 active:scale-[0.98] transition-all border border-rose-400/40"
+                className="w-full py-3 rounded-[4px] bg-[#D93025] hover:bg-[#C5221F] text-[#FFFFFF] text-[14px] font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
-                <ShieldAlert className="h-5 w-5" />
-                <span>Trigger Instant SOS Broadcast</span>
+                <AlertCircle className="w-4 h-4" />
+                <span>Confirm & Dispatch Emergency SOS</span>
               </button>
             )}
-
-            {/* 24x7 Direct Helplines Strip */}
-            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-rose-950">
-              <span>Sikkim Tourist Helpline: 1364</span>
-              <span>Police Control Room: 112 / 100</span>
-              <span>Ambulance: 102 / 108</span>
-            </div>
           </div>
         )}
       </div>

@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Camera,
   CameraOff,
-  Sparkles,
   Download,
   RotateCw,
   RefreshCw,
@@ -40,7 +39,6 @@ interface ARTryOnStudioProps {
   onSnapshotCaptured?: (dataUrl: string) => void;
   onExploreVendors?: () => void;
 }
-
 
 type DetectionStatus =
   | 'uninitialized'
@@ -79,7 +77,6 @@ export default function ARTryOnStudio({
 }: ARTryOnStudioProps) {
   const garment = customGarment || TEST_GARMENT_ITEM;
 
-
   // DOM Refs
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -105,7 +102,6 @@ export default function ARTryOnStudio({
   const [showLayersDrawer, setShowLayersDrawer] = useState<boolean>(false);
   const [showPoseGuide, setShowPoseGuide] = useState<boolean>(false);
   const [showBrandedShareModal, setShowBrandedShareModal] = useState<boolean>(false);
-
 
   // Fine-tuning adjustments (Manual scale / offset overrides)
   const [manualScale, setManualScale] = useState<number>(1.0);
@@ -323,9 +319,6 @@ export default function ARTryOnStudio({
               if (results && results.landmarks && results.landmarks.length > 0) {
                 const landmarks = results.landmarks[0];
 
-                // Extract Key Body Landmarks:
-                // 0: Nose, 2: Left Eye, 5: Right Eye, 7: Left Ear, 8: Right Ear
-                // 11: Left Shoulder, 12: Right Shoulder, 23: Left Hip, 24: Right Hip
                 const noseRaw = landmarks[0];
                 const leftEyeRaw = landmarks[2];
                 const rightEyeRaw = landmarks[5];
@@ -404,9 +397,7 @@ export default function ARTryOnStudio({
 
                   setConfidence(Math.round(prev.confidence * 100));
 
-                  // -----------------------------------------------------------
                   // LAYER 1: BASE TRADITIONAL GARMENT
-                  // -----------------------------------------------------------
                   const baseGarmentImg = getCachedImage(garment.imageUrl);
                   if (baseGarmentImg && baseGarmentImg.complete) {
                     ctx.save();
@@ -429,9 +420,7 @@ export default function ARTryOnStudio({
                     ctx.restore();
                   }
 
-                  // -----------------------------------------------------------
                   // LAYER 2: SECONDARY WAISTCOAT / APRON / SASH OVERLAY
-                  // -----------------------------------------------------------
                   if (selectedLayer) {
                     const layerImg = getCachedImage(selectedLayer.imageUrl);
                     if (layerImg && layerImg.complete) {
@@ -458,9 +447,7 @@ export default function ARTryOnStudio({
                     }
                   }
 
-                  // -----------------------------------------------------------
                   // LAYER 3: TRADITIONAL HEADGEAR / CAP
-                  // -----------------------------------------------------------
                   if (selectedHeadgear && (noseRaw || leftEarRaw || rightEarRaw || leftEyeRaw)) {
                     const nose = noseRaw ? { x: mapX(noseRaw.x), y: mapY(noseRaw.y) } : null;
                     const le = leftEarRaw ? { x: mapX(leftEarRaw.x), y: mapY(leftEarRaw.y) } : null;
@@ -470,17 +457,14 @@ export default function ARTryOnStudio({
 
                     const headCenterX = nose ? nose.x : (ls.x + rs.x) / 2;
                     const eyeY = ley && rey ? (ley.y + rey.y) / 2 : (nose ? nose.y - shoulderDist * 0.4 : ls.y - shoulderDist * 0.6);
-                    
-                    // Head width based on ear span or shoulder ratio
+
                     let headSpan = shoulderDist * 0.65;
                     if (le && re) {
                       headSpan = Math.hypot(re.x - le.x, re.y - le.y) * 1.35;
                     }
 
-                    // Position headgear on forehead/crown
                     const targetHeadY = eyeY - (headSpan * selectedHeadgear.anchorPoints.verticalHeadOffsetRatio);
-                    
-                    // Head angle tilt
+
                     let targetHeadAngle = prev.angle;
                     if (le && re) {
                       const hdx = isMirrored ? le.x - re.x : re.x - le.x;
@@ -491,7 +475,6 @@ export default function ARTryOnStudio({
                     const targetHeadWidth = headSpan * selectedHeadgear.anchorPoints.widthScaleRatio * manualScale;
                     const targetHeadHeight = (headSpan * 0.6) * selectedHeadgear.anchorPoints.heightScaleRatio * manualScale;
 
-                    // Smooth headgear coordinates
                     const headAlpha = 0.7;
                     const prevHead = smoothedHeadRef.current;
                     if (!prevHead.initialized) {
@@ -504,7 +487,7 @@ export default function ARTryOnStudio({
                     } else {
                       prevHead.headX = prevHead.headX * (1 - headAlpha) + headCenterX * headAlpha;
                       prevHead.headY = prevHead.headY * (1 - headAlpha) + targetHeadY * headAlpha;
-                      
+
                       let hAngleDiff = targetHeadAngle - prevHead.angle;
                       while (hAngleDiff < -Math.PI) hAngleDiff += Math.PI * 2;
                       while (hAngleDiff > Math.PI) hAngleDiff -= Math.PI * 2;
@@ -540,22 +523,22 @@ export default function ARTryOnStudio({
                   // Optional Debug Skeleton Overlay
                   if (showDebugSkeleton) {
                     ctx.save();
-                    ctx.strokeStyle = '#38bdf8';
-                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = '#1A73E8';
+                    ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.moveTo(ls.x, ls.y);
                     ctx.lineTo(rs.x, rs.y);
                     ctx.stroke();
 
-                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillStyle = '#E37400';
                     ctx.beginPath();
-                    ctx.arc(ls.x, ls.y, 6, 0, Math.PI * 2);
-                    ctx.arc(rs.x, rs.y, 6, 0, Math.PI * 2);
+                    ctx.arc(ls.x, ls.y, 5, 0, Math.PI * 2);
+                    ctx.arc(rs.x, rs.y, 5, 0, Math.PI * 2);
                     ctx.fill();
 
-                    ctx.fillStyle = '#10b981';
+                    ctx.fillStyle = '#1E8E3E';
                     ctx.beginPath();
-                    ctx.arc(prev.neckX, prev.neckY, 8, 0, Math.PI * 2);
+                    ctx.arc(prev.neckX, prev.neckY, 6, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                   }
@@ -602,8 +585,10 @@ export default function ARTryOnStudio({
       mounted = false;
       if (videoRef.current && videoRef.current.srcObject) {
         try {
-          const stream = videoRef.current.srcObject as MediaStream;
-          stream.getTracks().forEach((track) => track.stop());
+          const stream = videoRef.current as HTMLVideoElement;
+          if (stream.srcObject) {
+            (stream.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
+          }
         } catch {
           // ignore
         }
@@ -654,63 +639,52 @@ export default function ARTryOnStudio({
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center w-full max-w-5xl mx-auto rounded-3xl border border-emerald-500/20 bg-slate-950/80 p-4 sm:p-6 shadow-2xl backdrop-blur-2xl overflow-hidden"
+      className="relative flex flex-col items-center w-full bg-[#FFFFFF] border border-[#DADCE0] rounded-[8px] p-4 sm:p-5 shadow-[0_1px_2px_0_rgba(60,64,67,0.08)] overflow-hidden"
     >
       {/* Top Header Bar */}
-      <div className="w-full flex flex-wrap items-center justify-between gap-3 border-b border-emerald-500/20 pb-4 mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-md">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <span>Virtual AR Attire Studio</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                MediaPipe Multi-Layer
-              </span>
-            </h2>
-            <p className="text-xs text-slate-400">
-              Live body tracking, proportional scaling & accessory layering (30+ FPS)
-            </p>
-          </div>
+      <div className="w-full flex flex-wrap items-center justify-between gap-3 border-b border-[#DADCE0] pb-3 mb-3">
+        <div>
+          <h2 className="text-[16px] font-medium text-[#202124] leading-tight">
+            Virtual AR Attire Studio
+          </h2>
+          <p className="text-[12px] text-[#5F6368]">
+            Live upper-body tracking, proportional scaling & accessory layering (30+ FPS)
+          </p>
         </div>
 
-        {/* Action Toolbar */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Action Toolbar (Google Outlined & Chip Style) */}
+        <div className="flex flex-wrap items-center gap-1.5">
           {/* Pose Guide Hint */}
           <button
             onClick={() => setShowPoseGuide(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all"
-            title="How to pose for best tracking"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] text-[12px] font-medium border border-[#DADCE0] bg-[#FFFFFF] text-[#0B3D91] hover:bg-[#F8F9FA] transition-colors"
+            title="How to pose for optimal tracking"
           >
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <HelpCircle className="w-3.5 h-3.5 text-[#0B3D91]" />
             <span className="hidden sm:inline">Pose Guide</span>
           </button>
 
           {/* Layer Stacking Drawer Toggle */}
           <button
             onClick={() => setShowLayersDrawer(!showLayersDrawer)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] text-[12px] font-medium border transition-colors ${
               showLayersDrawer || selectedHeadgear || selectedLayer
-                ? 'bg-teal-500/20 text-teal-300 border-teal-500/40 shadow-sm'
-                : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-white'
+                ? 'bg-[#E8F0FE] text-[#0B3D91] border-[#D2E3FC]'
+                : 'border-[#DADCE0] bg-[#FFFFFF] text-[#5F6368] hover:bg-[#F8F9FA] hover:text-[#202124]'
             }`}
             title="Toggle accessories & outer layers"
           >
             <Layers className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Layers</span>
-            {(selectedHeadgear || selectedLayer) && (
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
-            )}
           </button>
 
           {/* Debug Skeleton Toggle */}
           <button
             onClick={() => setShowDebugSkeleton(!showDebugSkeleton)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] text-[12px] font-medium border transition-colors ${
               showDebugSkeleton
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm'
-                : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-white'
+                ? 'bg-[#FEF7E0] text-[#B06000] border-[#FEEFC3]'
+                : 'border-[#DADCE0] bg-[#FFFFFF] text-[#5F6368] hover:bg-[#F8F9FA] hover:text-[#202124]'
             }`}
             title="Toggle landmark skeleton overlay"
           >
@@ -721,10 +695,10 @@ export default function ARTryOnStudio({
           {/* Mirror Toggle */}
           <button
             onClick={() => setIsMirrored(!isMirrored)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] text-[12px] font-medium border transition-colors ${
               isMirrored
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
-                : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-white'
+                ? 'bg-[#E8F0FE] text-[#0B3D91] border-[#D2E3FC]'
+                : 'border-[#DADCE0] bg-[#FFFFFF] text-[#5F6368] hover:bg-[#F8F9FA] hover:text-[#202124]'
             }`}
             title="Mirror video feed"
           >
@@ -732,25 +706,25 @@ export default function ARTryOnStudio({
             <span className="hidden sm:inline">Mirror</span>
           </button>
 
-          {/* Mobile Camera Switcher (Front/Back) */}
+          {/* Camera Flip Switcher */}
           <button
             onClick={() => {
               setCameraFacing((prev) => (prev === 'user' ? 'environment' : 'user'));
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900/60 text-slate-300 border border-slate-700/60 hover:bg-slate-800 hover:text-white transition-all"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] text-[12px] font-medium border border-[#DADCE0] bg-[#FFFFFF] text-[#5F6368] hover:bg-[#F8F9FA] hover:text-[#202124] transition-colors"
             title="Flip camera (Front / Back)"
           >
-            <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
+            <RefreshCw className="w-3.5 h-3.5 text-[#0B3D91]" />
             <span className="hidden sm:inline">{cameraFacing === 'user' ? 'Front' : 'Back'}</span>
           </button>
 
-          {/* Adjustments Slider Toggle */}
+          {/* Fine-Tuning Fit Toggle */}
           <button
             onClick={() => setShowAdjustmentSliders(!showAdjustmentSliders)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] text-[12px] font-medium border transition-colors ${
               showAdjustmentSliders
-                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 shadow-sm'
-                : 'bg-slate-900/60 text-slate-400 border-slate-700/60 hover:text-white'
+                ? 'bg-[#E8F0FE] text-[#0B3D91] border-[#D2E3FC]'
+                : 'border-[#DADCE0] bg-[#FFFFFF] text-[#5F6368] hover:bg-[#F8F9FA] hover:text-[#202124]'
             }`}
             title="Manual garment fine-tuning"
           >
@@ -758,10 +732,10 @@ export default function ARTryOnStudio({
             <span className="hidden sm:inline">Fit</span>
           </button>
 
-          {/* Fullscreen */}
+          {/* Fullscreen Toggle */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-900/60 border border-slate-700/60 transition-all"
+            className="p-1.5 rounded-[4px] text-[#5F6368] hover:text-[#202124] border border-[#DADCE0] bg-[#FFFFFF] hover:bg-[#F8F9FA] transition-colors"
             title="Toggle fullscreen"
           >
             {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -771,33 +745,33 @@ export default function ARTryOnStudio({
 
       {/* Accessories & Stacking Layers Drawer */}
       {showLayersDrawer && (
-        <div className="w-full mb-4 p-4 rounded-2xl bg-slate-900/90 border border-teal-500/30 space-y-4 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2">
-            <div className="flex items-center gap-2 text-teal-300 font-bold text-xs">
+        <div className="w-full mb-3 p-3.5 rounded-[4px] bg-[#F8F9FA] border border-[#DADCE0] space-y-3">
+          <div className="flex items-center justify-between border-b border-[#DADCE0] pb-2">
+            <div className="flex items-center gap-1.5 text-[#0B3D91] font-medium text-[13px]">
               <Layers className="w-4 h-4" />
               <span>Multi-Piece Layer Stacking (Headgear & Outer Layers)</span>
             </div>
             <button
               onClick={() => setShowLayersDrawer(false)}
-              className="text-xs text-slate-400 hover:text-white"
+              className="text-[12px] text-[#5F6368] hover:text-[#202124]"
             >
               Close
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Traditional Headgear Selector */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+            {/* Traditional Headgear */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-[#5F6368] block">
                 Traditional Headgear (Layer 3)
               </span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 <button
                   onClick={() => setSelectedHeadgear(null)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                  className={`px-2.5 py-1 rounded-[4px] text-[12px] font-medium border transition-colors ${
                     selectedHeadgear === null
-                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
-                      : 'bg-slate-950/60 text-slate-400 border-white/10 hover:text-white'
+                      ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                      : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA]'
                   }`}
                 >
                   None
@@ -806,10 +780,10 @@ export default function ARTryOnStudio({
                   <button
                     key={hat.id}
                     onClick={() => setSelectedHeadgear(hat)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                    className={`px-2.5 py-1 rounded-[4px] text-[12px] font-medium border transition-colors ${
                       selectedHeadgear?.id === hat.id
-                        ? 'bg-teal-500 text-slate-950 border-teal-400 font-bold shadow-md'
-                        : 'bg-slate-950/60 text-slate-300 border-white/10 hover:text-white'
+                        ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                        : 'bg-[#FFFFFF] text-[#202124] border-[#DADCE0] hover:bg-[#F8F9FA]'
                     }`}
                   >
                     {hat.name}
@@ -818,18 +792,18 @@ export default function ARTryOnStudio({
               </div>
             </div>
 
-            {/* Secondary Outer Layer Selector */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+            {/* Secondary Outer Layer */}
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-medium uppercase tracking-wider text-[#5F6368] block">
                 Outer Layer / Sash (Layer 2)
               </span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 <button
                   onClick={() => setSelectedLayer(null)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                  className={`px-2.5 py-1 rounded-[4px] text-[12px] font-medium border transition-colors ${
                     selectedLayer === null
-                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
-                      : 'bg-slate-950/60 text-slate-400 border-white/10 hover:text-white'
+                      ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                      : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA]'
                   }`}
                 >
                   None
@@ -838,10 +812,10 @@ export default function ARTryOnStudio({
                   <button
                     key={layer.id}
                     onClick={() => setSelectedLayer(layer)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                    className={`px-2.5 py-1 rounded-[4px] text-[12px] font-medium border transition-colors ${
                       selectedLayer?.id === layer.id
-                        ? 'bg-purple-500 text-white border-purple-400 font-bold shadow-md'
-                        : 'bg-slate-950/60 text-slate-300 border-white/10 hover:text-white'
+                        ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                        : 'bg-[#FFFFFF] text-[#202124] border-[#DADCE0] hover:bg-[#F8F9FA]'
                     }`}
                   >
                     {layer.name}
@@ -853,9 +827,8 @@ export default function ARTryOnStudio({
         </div>
       )}
 
-      {/* Main Viewport Container */}
-      <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[640px] rounded-2xl bg-black border border-emerald-500/30 overflow-hidden shadow-inner flex items-center justify-center">
-        {/* Hidden Video Source Element */}
+      {/* Main Camera Viewport Frame */}
+      <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[580px] rounded-[4px] bg-[#000000] border border-[#DADCE0] overflow-hidden flex items-center justify-center">
         <video
           ref={videoRef}
           playsInline
@@ -864,55 +837,53 @@ export default function ARTryOnStudio({
           className="hidden"
         />
 
-        {/* Live Canvas Output Element */}
         <canvas
           ref={canvasRef}
           className="w-full h-full object-contain"
         />
 
-        {/* Top-Left Telemetry HUD */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20 pointer-events-none">
-          <div className="flex items-center gap-2 bg-slate-950/85 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-[11px] shadow-lg">
-            <span className={`w-2 h-2 rounded-full ${fps >= 20 ? 'bg-emerald-400' : 'bg-amber-400'} animate-pulse`} />
-            <span className="font-mono font-bold text-white">{fps} FPS</span>
-            <span className="text-white/40">|</span>
-            <span className="text-white/70">Confidence:</span>
-            <span className={`font-mono font-bold ${confidence > 55 ? 'text-emerald-400' : 'text-amber-400'}`}>
+        {/* Top-Left Telemetry HUD (Google Chip Style) */}
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-20 pointer-events-none">
+          <div className="flex items-center gap-1.5 bg-[#FFFFFF]/90 backdrop-blur-sm px-2.5 py-1 rounded-full border border-[#DADCE0] text-[11px] shadow-sm text-[#202124]">
+            <span className={`w-2 h-2 rounded-full ${fps >= 20 ? 'bg-[#1E8E3E]' : 'bg-[#E37400]'}`} />
+            <span className="font-mono font-medium">{fps} FPS</span>
+            <span className="text-[#DADCE0]">|</span>
+            <span className="text-[#5F6368]">Confidence:</span>
+            <span className={`font-mono font-medium ${confidence > 55 ? 'text-[#1E8E3E]' : 'text-[#E37400]'}`}>
               {confidence}%
             </span>
           </div>
 
-          {/* Status Badge */}
           {status === 'active_tracking' && (
-            <div className="flex items-center gap-1.5 bg-emerald-950/80 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-emerald-500/30 text-[10px] text-emerald-300 font-semibold w-fit">
+            <div className="flex items-center gap-1 bg-[#E6F4EA]/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-[#CEEAD6] text-[10px] text-[#137333] font-medium w-fit">
               <ShieldCheck className="w-3 h-3" />
               <span>Pose Locked</span>
             </div>
           )}
           {status === 'no_person_detected' && (
-            <div className="flex items-center gap-1.5 bg-amber-950/80 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-amber-500/30 text-[10px] text-amber-300 font-semibold w-fit">
+            <div className="flex items-center gap-1 bg-[#FEF7E0]/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-[#FEEFC3] text-[10px] text-[#B06000] font-medium w-fit">
               <AlertTriangle className="w-3 h-3" />
-              <span>Step back into view</span>
+              <span>Step into frame</span>
             </div>
           )}
         </div>
 
-        {/* Active Layers Stack Badge */}
-        <div className="absolute top-3 right-3 z-20 pointer-events-none max-w-[240px]">
-          <div className="bg-slate-950/85 backdrop-blur-md p-2.5 rounded-xl border border-emerald-500/30 text-xs shadow-lg space-y-1">
-            <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">
-              Active Outfit Stack
+        {/* Top-Right Active Outfit Stack Chip */}
+        <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none max-w-[220px]">
+          <div className="bg-[#FFFFFF]/90 backdrop-blur-sm p-2 rounded-[4px] border border-[#DADCE0] text-[11px] shadow-sm space-y-0.5">
+            <span className="text-[10px] uppercase font-medium text-[#0B3D91] block">
+              Active Attire
             </span>
-            <div className="text-white text-xs font-semibold truncate">
+            <div className="text-[#202124] font-medium truncate">
               {garment.name}
             </div>
             {selectedLayer && (
-              <div className="text-[11px] text-purple-300 truncate">
+              <div className="text-[#5F6368] text-[10px] truncate">
                 + {selectedLayer.name}
               </div>
             )}
             {selectedHeadgear && (
-              <div className="text-[11px] text-teal-300 truncate">
+              <div className="text-[#5F6368] text-[10px] truncate">
                 + {selectedHeadgear.name}
               </div>
             )}
@@ -921,19 +892,16 @@ export default function ARTryOnStudio({
 
         {/* Loading Overlay */}
         {(status === 'loading_engine' || status === 'requesting_camera') && (
-          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-30 space-y-4">
-            <div className="relative w-14 h-14">
-              <div className="absolute inset-0 rounded-full border-2 border-emerald-500/20 border-t-emerald-400 animate-spin" />
-              <div className="absolute inset-2 rounded-full border-2 border-teal-500/20 border-b-teal-400 animate-spin" style={{ animationDirection: 'reverse' }} />
-            </div>
+          <div className="absolute inset-0 bg-[#FFFFFF]/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-30 space-y-3">
+            <div className="w-8 h-8 rounded-full border-2 border-[#DADCE0] border-t-[#0B3D91] animate-spin" />
             <div className="space-y-1">
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-[14px] font-medium text-[#202124]">
                 {status === 'loading_engine'
-                  ? 'Initializing MediaPipe Pose & Vision Engine...'
+                  ? 'Initializing MediaPipe Pose & Vision Task...'
                   : 'Connecting to Camera Stream...'}
               </h3>
-              <p className="text-xs text-slate-400 max-w-xs">
-                Calibrating 33-point real-time pose detector for multi-layer wardrobe try-on
+              <p className="text-[12px] text-[#5F6368] max-w-xs">
+                Calibrating real-time 33-point upper body landmarks
               </p>
             </div>
           </div>
@@ -941,35 +909,35 @@ export default function ARTryOnStudio({
 
         {/* Camera Permission Denied Overlay */}
         {status === 'camera_denied' && (
-          <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-30 space-y-4">
-            <div className="p-4 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">
-              <CameraOff className="w-8 h-8" />
+          <div className="absolute inset-0 bg-[#FFFFFF]/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-30 space-y-3">
+            <div className="p-3 rounded-full bg-[#FCE8E6] text-[#C5221F]">
+              <CameraOff className="w-6 h-6" />
             </div>
-            <div className="space-y-2 max-w-md">
-              <h3 className="text-base font-bold text-white">Camera Access Required</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
+            <div className="space-y-1 max-w-md">
+              <h3 className="text-[15px] font-medium text-[#202124]">Camera Access Required</h3>
+              <p className="text-[12px] text-[#5F6368] leading-relaxed">
                 {errorMessage ||
                   'Webcam permission is needed to track your body posture and fit traditional attire in real time.'}
               </p>
             </div>
             <button
               onClick={startCamera}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[13px] font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" />
-              <span>Retry Camera Permission</span>
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry Permission</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Manual Fine-Tuning Slider Drawer */}
+      {/* Manual Fine-Tuning Drawer */}
       {showAdjustmentSliders && (
-        <div className="w-full mt-4 p-4 rounded-2xl bg-slate-900/90 border border-purple-500/30 space-y-3 animate-in fade-in duration-200">
+        <div className="w-full mt-3 p-3.5 rounded-[4px] bg-[#F8F9FA] border border-[#DADCE0] space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-purple-300 flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Garment Fitting Fine-Tuning</span>
+            <h4 className="text-[13px] font-medium text-[#202124] flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5 text-[#0B3D91]" />
+              <span>Garment Fitting Calibration</span>
             </h4>
             <button
               onClick={() => {
@@ -977,17 +945,17 @@ export default function ARTryOnStudio({
                 setManualOffsetY(0);
                 setManualOffsetX(0);
               }}
-              className="text-[10px] text-purple-300/80 hover:text-white underline"
+              className="text-[11px] text-[#0B3D91] hover:underline font-medium"
             >
               Reset Defaults
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[12px]">
             <div className="space-y-1">
-              <div className="flex justify-between text-[11px] text-slate-300">
+              <div className="flex justify-between text-[#5F6368]">
                 <span>Scale Multiplier:</span>
-                <span className="font-mono text-purple-300">{manualScale.toFixed(2)}x</span>
+                <span className="font-mono text-[#202124]">{manualScale.toFixed(2)}x</span>
               </div>
               <input
                 type="range"
@@ -996,14 +964,14 @@ export default function ARTryOnStudio({
                 step="0.02"
                 value={manualScale}
                 onChange={(e) => setManualScale(parseFloat(e.target.value))}
-                className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
+                className="w-full h-1 bg-[#DADCE0] rounded appearance-none cursor-pointer accent-[#0B3D91]"
               />
             </div>
 
             <div className="space-y-1">
-              <div className="flex justify-between text-[11px] text-slate-300">
+              <div className="flex justify-between text-[#5F6368]">
                 <span>Vertical Offset (Y):</span>
-                <span className="font-mono text-purple-300">{manualOffsetY} px</span>
+                <span className="font-mono text-[#202124]">{manualOffsetY} px</span>
               </div>
               <input
                 type="range"
@@ -1012,14 +980,14 @@ export default function ARTryOnStudio({
                 step="2"
                 value={manualOffsetY}
                 onChange={(e) => setManualOffsetY(parseInt(e.target.value, 10))}
-                className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
+                className="w-full h-1 bg-[#DADCE0] rounded appearance-none cursor-pointer accent-[#0B3D91]"
               />
             </div>
 
             <div className="space-y-1">
-              <div className="flex justify-between text-[11px] text-slate-300">
+              <div className="flex justify-between text-[#5F6368]">
                 <span>Horizontal Offset (X):</span>
-                <span className="font-mono text-purple-300">{manualOffsetX} px</span>
+                <span className="font-mono text-[#202124]">{manualOffsetX} px</span>
               </div>
               <input
                 type="range"
@@ -1028,7 +996,7 @@ export default function ARTryOnStudio({
                 step="2"
                 value={manualOffsetX}
                 onChange={(e) => setManualOffsetX(parseInt(e.target.value, 10))}
-                className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
+                className="w-full h-1 bg-[#DADCE0] rounded appearance-none cursor-pointer accent-[#0B3D91]"
               />
             </div>
           </div>
@@ -1036,75 +1004,68 @@ export default function ARTryOnStudio({
       )}
 
       {/* Bottom Action Controls */}
-      <div className="w-full mt-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <Info className="w-4 h-4 text-emerald-400 shrink-0" />
+      <div className="w-full mt-3 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#DADCE0]">
+        <div className="flex items-center gap-1.5 text-[12px] text-[#5F6368]">
+          <Info className="w-3.5 h-3.5 text-[#0B3D91] shrink-0" />
           <span>
-            Stand 1.5 – 2.5 meters away so shoulders and waist are visible. Garments scale dynamically as you move.
+            Position yourself 1.5 – 2.5m away so shoulders and waist are visible.
           </span>
         </div>
 
-        {/* Snapshot Capture Button */}
         <button
           onClick={handleCaptureSnapshot}
           disabled={status !== 'active_tracking'}
-          className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full sm:w-auto px-4 py-2 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[13px] font-medium transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          <Camera className="w-4 h-4 text-slate-950" />
+          <Camera className="w-4 h-4 text-[#FFFFFF]" />
           <span>Take AR Snapshot</span>
         </button>
       </div>
 
       {/* "How to Pose" Onboarding Modal */}
       {showPoseGuide && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg rounded-3xl border border-emerald-500/30 bg-slate-900 p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="relative w-full max-w-md rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] p-5 shadow-lg space-y-4">
+            <div className="flex items-center justify-between border-b border-[#DADCE0] pb-3">
               <div className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-base font-bold text-white">How to Pose for Best AR Tracking</h3>
+                <Lightbulb className="w-4 h-4 text-[#0B3D91]" />
+                <h3 className="text-[16px] font-medium text-[#202124]">How to Pose for Optimal Tracking</h3>
               </div>
               <button
                 onClick={() => setShowPoseGuide(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                className="p-1 rounded-[4px] text-[#5F6368] hover:text-[#202124] hover:bg-[#F8F9FA]"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-4 text-xs text-slate-300">
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-white/10">
-                <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
-                  <Compass className="w-4 h-4" />
-                </div>
+            <div className="space-y-3 text-[13px] text-[#5F6368]">
+              <div className="flex items-start gap-2.5 p-3 rounded-[4px] bg-[#F8F9FA] border border-[#DADCE0]">
+                <Compass className="w-4 h-4 text-[#0B3D91] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-white text-xs">1. Step Back for Full Upper Body</h4>
-                  <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                    Position your phone or webcam so your head, shoulders, and waist are clearly inside the camera frame (approx. 1.5 to 2.5 meters away).
+                  <h4 className="font-medium text-[#202124] text-[13px]">1. Step Back for Full Upper Body</h4>
+                  <p className="text-[12px] text-[#5F6368] mt-0.5">
+                    Position your phone or webcam so head, shoulders, and waist are inside the camera frame (approx. 1.5 to 2.5 meters away).
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-white/10">
-                <div className="p-2 rounded-xl bg-teal-500/20 text-teal-400 shrink-0">
-                  <Lightbulb className="w-4 h-4" />
-                </div>
+              <div className="flex items-start gap-2.5 p-3 rounded-[4px] bg-[#F8F9FA] border border-[#DADCE0]">
+                <Lightbulb className="w-4 h-4 text-[#0B3D91] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-white text-xs">2. Frontal Natural Lighting</h4>
-                  <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                    Ensure adequate room light or face a window. Avoid dark rooms or bright backlight behind you.
+                  <h4 className="font-medium text-[#202124] text-[13px]">2. Frontal Natural Lighting</h4>
+                  <p className="text-[12px] text-[#5F6368] mt-0.5">
+                    Ensure adequate room light. Avoid placing bright windows or direct backlight behind you.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-950/60 border border-white/10">
-                <div className="p-2 rounded-xl bg-purple-500/20 text-purple-400 shrink-0">
-                  <Sparkles className="w-4 h-4" />
-                </div>
+              <div className="flex items-start gap-2.5 p-3 rounded-[4px] bg-[#F8F9FA] border border-[#DADCE0]">
+                <ShieldCheck className="w-4 h-4 text-[#0B3D91] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-white text-xs">3. Relaxed Natural A-Pose</h4>
-                  <p className="text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                    Keep your shoulders level and your arms slightly relaxed away from your sides for the cleanest robe and sash alignment.
+                  <h4 className="font-medium text-[#202124] text-[13px]">3. Natural Posture</h4>
+                  <p className="text-[12px] text-[#5F6368] mt-0.5">
+                    Keep your shoulders level and arms slightly relaxed from your sides for accurate robe draping.
                   </p>
                 </div>
               </div>
@@ -1112,9 +1073,9 @@ export default function ARTryOnStudio({
 
             <button
               onClick={() => setShowPoseGuide(false)}
-              className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md"
+              className="w-full py-2 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[13px] font-medium transition-colors"
             >
-              Got It, Let&apos;s Try On!
+              Continue to AR Studio
             </button>
           </div>
         </div>
@@ -1122,22 +1083,22 @@ export default function ARTryOnStudio({
 
       {/* Snapshot Preview Modal */}
       {snapshotDataUrl && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl rounded-3xl border border-emerald-500/30 bg-slate-900 p-5 sm:p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#000000]/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="relative w-full max-w-lg rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] p-5 shadow-lg space-y-4">
+            <div className="flex items-center justify-between border-b border-[#DADCE0] pb-3">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-base font-bold text-white">AR Photo Captured</h3>
+                <CheckCircle2 className="w-4 h-4 text-[#1E8E3E]" />
+                <h3 className="text-[16px] font-medium text-[#202124]">AR Photo Captured</h3>
               </div>
               <button
                 onClick={() => setSnapshotDataUrl(null)}
-                className="text-xs text-slate-400 hover:text-white px-2 py-1"
+                className="text-[12px] text-[#5F6368] hover:text-[#202124] px-1.5 py-0.5"
               >
                 Close
               </button>
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[4/3] flex items-center justify-center">
+            <div className="rounded-[4px] overflow-hidden border border-[#DADCE0] bg-[#000000] aspect-[4/3] flex items-center justify-center">
               <img
                 src={snapshotDataUrl}
                 alt="AR Try-On Snapshot"
@@ -1145,26 +1106,26 @@ export default function ARTryOnStudio({
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            <div className="flex flex-col sm:flex-row gap-2 pt-1">
               <button
                 onClick={() => setShowBrandedShareModal(true)}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+                className="flex-1 py-2 px-3 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Share2 className="w-4 h-4" />
                 <span>Create Branded Share Postcard</span>
               </button>
               <button
                 onClick={handleDownloadSnapshot}
-                className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
+                className="py-2 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] hover:bg-[#F8F9FA] text-[#0B3D91] text-[13px] font-medium transition-colors flex items-center justify-center gap-1.5"
               >
                 <Download className="w-4 h-4" />
                 <span>Download Raw (PNG)</span>
               </button>
               <button
                 onClick={() => setSnapshotDataUrl(null)}
-                className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all"
+                className="py-2 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] hover:bg-[#F8F9FA] text-[#5F6368] text-[13px] font-medium transition-colors"
               >
-                Retake Photo
+                Retake
               </button>
             </div>
           </div>
@@ -1185,4 +1146,3 @@ export default function ARTryOnStudio({
     </div>
   );
 }
-

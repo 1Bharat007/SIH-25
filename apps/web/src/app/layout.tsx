@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Providers } from './providers';
+import EnterpriseHeader from '../components/common/EnterpriseHeader';
 import FloatingSOSButton from '../components/safety/FloatingSOSButton';
 import RealtimeAlertBanner from '../components/disaster/RealtimeAlertBanner';
 import AIChatCompanionWidget from '../components/chat/AIChatCompanionWidget';
@@ -7,13 +8,13 @@ import OfflineStatusBanner from '../components/offline/OfflineStatusBanner';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Sikkim Yatra — Smart Offline-First Digital Tourism Platform',
+  title: 'Sikkim Yatra — Official Tourism, Safety & Permits Portal',
   description:
-    'Experience the beauty of Sikkim with smart offline-first navigation, permits, cultural guides, and real-time mountain tracking.',
+    'Official government portal for Sikkim tourism, high-altitude permits, disaster alerts, and authentic cultural heritage.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'Sikkim Yatra',
   },
   icons: {
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0f766e',
+  themeColor: '#0B3D91',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -36,9 +37,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#031e1a] text-[#f0fdf9] antialiased selection:bg-[#0fb49a] selection:text-[#022c22]">
+    <html lang="en">
+      <body className="min-h-screen bg-[#F8F9FA] text-[#202124] antialiased selection:bg-[#E8F0FE] selection:text-[#0B3D91]">
         <Providers>
+          <EnterpriseHeader />
           <OfflineStatusBanner />
           <RealtimeAlertBanner />
           {children}
@@ -49,6 +51,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
-
-

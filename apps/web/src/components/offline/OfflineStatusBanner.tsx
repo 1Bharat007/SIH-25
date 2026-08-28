@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { WifiOff, RefreshCw, HardDrive, CheckCircle2, ArrowRight } from 'lucide-react';
+import { WifiOff, RefreshCw, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useNetworkSync } from '../../hooks/useNetworkSync';
 
 export default function OfflineStatusBanner() {
@@ -16,41 +16,27 @@ export default function OfflineStatusBanner() {
   return (
     <aside
       aria-label="Network Connectivity and Offline Sync Status"
-      className={`w-full px-4 py-2.5 text-xs font-semibold border-b transition-all animate-fadeIn ${
+      className={`w-full px-4 py-2 text-[12px] border-b transition-colors ${
         !isOnline
-          ? 'bg-amber-950/90 text-amber-200 border-amber-500/40 shadow-lg'
+          ? 'bg-[#FEF7E0] text-[#B06000] border-[#FEEFC3]'
           : isSyncing
-          ? 'bg-teal-950/90 text-teal-200 border-teal-500/40 shadow-lg'
-          : 'bg-emerald-950/90 text-emerald-200 border-emerald-500/40 shadow-lg'
+            ? 'bg-[#E8F0FE] text-[#0B3D91] border-[#D2E3FC]'
+            : 'bg-[#E6F4EA] text-[#137333] border-[#CEEAD6]'
       }`}
     >
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         {/* Status Message */}
-        <div className="flex items-center gap-2.5">
-          {!isOnline && (
-            <div className="p-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40">
-              <WifiOff className="w-4 h-4" />
-            </div>
-          )}
-
-          {isOnline && isSyncing && (
-            <div className="p-1 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40">
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            </div>
-          )}
-
-          {isOnline && !isSyncing && pendingCount > 0 && (
-            <div className="p-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          )}
+        <div className="flex items-center gap-2">
+          {!isOnline && <WifiOff className="w-3.5 h-3.5" />}
+          {isOnline && isSyncing && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+          {isOnline && !isSyncing && pendingCount > 0 && <CheckCircle2 className="w-3.5 h-3.5" />}
 
           <div>
             {!isOnline && (
               <span>
-                <strong>Offline Mode Active:</strong> Serving places, monasteries, and emergency data from local IndexedDB cache.
+                <strong className="font-medium">Offline Mode:</strong> Serving data from local device storage.
                 {pendingCount > 0 && (
-                  <span className="ml-1.5 px-2 py-0.5 rounded-full bg-amber-500/30 text-amber-100 text-[10px] font-bold">
+                  <span className="ml-1.5 px-2 py-0.5 rounded-full bg-[#FFFFFF] border border-[#FEEFC3] text-[11px] font-medium">
                     {pendingCount} action{pendingCount > 1 ? 's' : ''} queued
                   </span>
                 )}
@@ -59,13 +45,13 @@ export default function OfflineStatusBanner() {
 
             {isOnline && isSyncing && (
               <span>
-                <strong>Synchronizing Offline Queue:</strong> Sending {pendingCount} queued action{pendingCount > 1 ? 's' : ''} to server...
+                <strong className="font-medium">Sync in progress:</strong> Transmitting queued offline actions to Sikkim servers...
               </span>
             )}
 
             {isOnline && !isSyncing && pendingCount > 0 && (
               <span>
-                <strong>Connection Restored:</strong> {pendingCount} offline action{pendingCount > 1 ? 's' : ''} pending synchronization.
+                <strong className="font-medium">Connection Restored:</strong> {pendingCount} offline action{pendingCount > 1 ? 's' : ''} ready to sync.
               </span>
             )}
           </div>
@@ -75,22 +61,20 @@ export default function OfflineStatusBanner() {
         <div className="flex items-center gap-2">
           {isOnline && pendingCount > 0 && (
             <button
-              onClick={syncNow}
+              onClick={() => syncNow()}
               disabled={isSyncing}
-              className="px-3 py-1 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-2.5 py-1 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[11px] font-medium transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+              {isSyncing ? 'Syncing...' : 'Sync Now'}
             </button>
           )}
 
           <Link
             href="/offline-settings"
-            className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 border border-white/10 transition-colors"
+            className="inline-flex items-center gap-1 font-medium hover:underline text-[11px]"
           >
-            <HardDrive className="w-3 h-3 text-teal-300" />
-            <span>Manage Regional Cache</span>
-            <ArrowRight className="w-3 h-3 text-white/60" />
+            <span>Offline Settings</span>
+            <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       </div>

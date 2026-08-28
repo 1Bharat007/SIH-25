@@ -42,10 +42,11 @@ app.use(errorMiddleware);
 
 // Server startup
 const server = app.listen(ENV.PORT, () => {
-  console.log(`🏔️ Sikkim Yatra Server running on http://localhost:${ENV.PORT}`);
-  console.log(`🩺 Health check available at http://localhost:${ENV.PORT}${ENV.API_PREFIX}/health`);
+  console.log(`[Server] Sikkim Yatra API running on http://localhost:${ENV.PORT}`);
+  console.log(`[Server] Health check available at http://localhost:${ENV.PORT}${ENV.API_PREFIX}/health`);
   initDisasterWebSocketServer(server);
 });
+
 
 export { app, server };
 

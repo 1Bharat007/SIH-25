@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Navigation, Copy, Check, MessageCircle, Square, Radio } from 'lucide-react';
+import { Navigation, Copy, Check, MessageCircle, Square } from 'lucide-react';
+
 import { LiveLocationSession } from '@sikkim-yatra/shared';
 import { safetyService } from '../../services/safety.service';
 import { useUserGeolocation } from '../../hooks/useSafety';
@@ -27,7 +28,7 @@ export default function LiveLocationShare() {
     let watchId: number;
     if (session && session.isActive && typeof window !== 'undefined' && navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
-        pos => {
+        (pos) => {
           safetyService.updateLiveLocation(session.token, {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
@@ -54,145 +55,147 @@ export default function LiveLocationShare() {
         const diff = new Date(session.expiresAt).getTime() - Date.now();
         if (diff <= 0) {
           setTimeLeft('Expired');
-          setSession(prev => (prev ? { ...prev, isActive: false } : null));
+          setSession((prev) => (prev ? { ...prev, isActive: false } : null));
         } else {
           const hours = Math.floor(diff / (1000 * 60 * 60));
           const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
           const secs = Math.floor((diff % (1000 * 60)) / 1000);
-          setTimeLeft(`${hours > 0 ? `${hours}h ` : ''}${mins}m ${secs < 10 ? '0' : ''}${secs}s`);
+          setTimeLeft(
+            `${hours > 0 ? `${hours}h ` : ''}${mins}m ${secs < 10 ? '0' : ''}${secs}s`
+          );
         }
       };
-
       updateTimer();
       interval = setInterval(updateTimer, 1000);
     }
     return () => clearInterval(interval);
   }, [session]);
 
-  const handleStartSharing = async () => {
-    setIsLoading(true);
+  const handleStartShare = async () => {
     try {
-      const newSession = await safetyService.startLiveLocation({
+      setIsLoading(true);
+      const newSession = await safetyService.createLiveLocationSession({
+        durationMinutes: duration,
         latitude: coordinates.latitude,
         longitude: coordinates.longitude,
         altitudeMeters: coordinates.altitudeMeters,
         accuracyMeters: coordinates.accuracyMeters,
         batteryLevel,
-        durationMinutes: duration,
       });
       setSession(newSession);
-    } catch {
-      // Ignore sharing error
+    } catch (err) {
+      console.error('Failed to create live location session:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleStopSharing = () => {
-    setSession(null);
+  const handleStopShare = async () => {
+    if (!session) return;
+    try {
+      setIsLoading(true);
+      const endedSession = await safetyService.endLiveLocationSession(session.token);
+      setSession(endedSession);
+    } catch (err) {
+      console.error('Failed to end live location session:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const fullShareUrl =
-    typeof window !== 'undefined' && session
-      ? `${window.location.origin}${session.shareableUrl}`
-      : '';
+  const shareUrl = session ? `${typeof window !== 'undefined' ? window.location.origin : ''}/safety/track/${session.token}` : '';
 
-  const handleCopy = () => {
-    if (fullShareUrl) {
-      navigator.clipboard.writeText(fullShareUrl);
+  const handleCopyLink = () => {
+    if (shareUrl) {
+      navigator.clipboard?.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     }
   };
 
-  const whatsappShareText = `I am sharing my live location in Sikkim with you: ${fullShareUrl} (Active for ${duration} mins).`;
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappShareText)}`;
+  const handleWhatsAppShare = () => {
+    if (shareUrl) {
+      const text = encodeURIComponent(
+        `I am sharing my live mountain tracking location in Sikkim via Sikkim Yatra: ${shareUrl}\n(Active for next ${duration} mins)`
+      );
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+  };
 
   return (
-    <div className="rounded-3xl border border-teal-500/20 bg-slate-900/60 p-6 shadow-xl backdrop-blur-xl">
-      <div className="flex items-center justify-between border-b border-teal-900/40 pb-4">
-        <div>
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <Radio className="h-5 w-5 text-teal-400 animate-pulse" />
-            <span>Share My Live Location</span>
+    <div className="rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] p-5 shadow-[0_1px_2px_0_rgba(60,64,67,0.08)] space-y-4">
+      <div className="flex items-center justify-between border-b border-[#DADCE0] pb-3">
+        <div className="flex items-center gap-2">
+          <Navigation className="w-4 h-4 text-[#0B3D91]" />
+          <h3 className="text-[15px] font-medium text-[#202124]">
+            Live Mountain Location Sharing
           </h3>
-          <p className="text-xs text-teal-300/70">
-            Send real-time GPS coordinates with auto-expiring secure link
-          </p>
         </div>
-
-        {session?.isActive && (
-          <span className="flex items-center gap-1.5 rounded-full bg-teal-500/20 px-3 py-1 text-xs font-bold text-teal-300 border border-teal-500/40 animate-pulse">
-            <span className="h-2 w-2 rounded-full bg-teal-400" />
-            <span>Live Sharing Active</span>
-          </span>
-        )}
+        <span className="text-[11px] font-medium bg-[#E8F0FE] text-[#0B3D91] px-2 py-0.5 rounded-full border border-[#D2E3FC]">
+          Temporary Web Link
+        </span>
       </div>
 
+      <p className="text-[12px] text-[#5F6368] leading-relaxed">
+        Generate a secure, time-limited tracking link for friends and family without requiring them to install an app.
+      </p>
+
       {session && session.isActive ? (
-        <div className="mt-5 space-y-4">
-          <div className="rounded-2xl border border-teal-500/30 bg-teal-950/30 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-[11px] font-semibold text-teal-400">Session Remaining</span>
-                <div className="text-xl font-bold font-mono text-white mt-0.5">{timeLeft}</div>
-              </div>
-              <button
-                onClick={handleStopSharing}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-950/40 px-3 py-1.5 text-xs font-semibold text-rose-300 hover:bg-rose-900/40"
-              >
-                <Square className="h-3 w-3 fill-current" />
-                <span>Stop Sharing</span>
-              </button>
+        /* Active Session Display */
+        <div className="rounded-[4px] border border-[#CEEAD6] bg-[#E6F4EA] p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-[13px] font-medium text-[#137333]">
+              <span className="w-2 h-2 rounded-full bg-[#1E8E3E] animate-pulse" />
+              <span>Location Sharing Active</span>
             </div>
+            <span className="text-[12px] font-mono font-medium text-[#137333]">
+              Expires in: {timeLeft}
+            </span>
           </div>
 
-          {/* Share Controls */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Shareable Live Tracking URL</span>
-              <button
-                onClick={handleCopy}
-                className="inline-flex items-center gap-1 font-semibold text-teal-400 hover:text-teal-300"
-              >
-                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                <span>{copied ? 'Copied Link' : 'Copy Link'}</span>
-              </button>
-            </div>
-
-            <input
-              type="text"
-              readOnly
-              value={fullShareUrl}
-              className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2.5 text-xs text-teal-200 font-mono"
-            />
-
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-all shadow-md"
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={handleWhatsAppShare}
+              className="flex-1 py-2 px-3 rounded-[4px] bg-[#1E8E3E] hover:bg-[#137333] text-[#FFFFFF] text-[12px] font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <MessageCircle className="h-4 w-4" />
-              <span>Share Link via WhatsApp</span>
-            </a>
+              <MessageCircle className="w-4 h-4" />
+              <span>Send via WhatsApp</span>
+            </button>
+
+            <button
+              onClick={handleCopyLink}
+              className="py-2 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] hover:bg-[#F8F9FA] text-[#0B3D91] text-[12px] font-medium transition-colors flex items-center justify-center gap-1.5"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-[#1E8E3E]" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Copied' : 'Copy Link'}</span>
+            </button>
           </div>
+
+          <button
+            onClick={handleStopShare}
+            disabled={isLoading}
+            className="w-full py-1.5 rounded-[4px] border border-[#FAD2CF] bg-[#FFFFFF] text-[#D93025] hover:bg-[#FCE8E6] text-[12px] font-medium transition-colors flex items-center justify-center gap-1"
+          >
+            <Square className="w-3.5 h-3.5" />
+            <span>Stop Sharing Immediately</span>
+          </button>
         </div>
       ) : (
-        <div className="mt-5 space-y-4">
+        /* Duration Selection & Trigger */
+        <div className="space-y-3">
           <div>
-            <label className="text-xs font-semibold text-teal-200 block mb-2">
+            <label className="block text-[12px] font-medium text-[#5F6368] mb-1.5">
               Select Sharing Duration:
             </label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {DURATIONS.map(d => (
+            <div className="grid grid-cols-4 gap-2">
+              {DURATIONS.map((d) => (
                 <button
                   key={d.minutes}
                   onClick={() => setDuration(d.minutes)}
-                  className={`rounded-2xl border p-3 text-xs font-bold transition-all ${
+                  className={`py-2 rounded-[4px] border text-[12px] font-medium transition-colors ${
                     duration === d.minutes
-                      ? 'border-teal-400 bg-teal-500/20 text-teal-200 shadow-md'
-                      : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'
+                      ? 'border-[#0B3D91] bg-[#E8F0FE] text-[#0B3D91]'
+                      : 'border-[#DADCE0] bg-[#FFFFFF] text-[#5F6368] hover:bg-[#F8F9FA]'
                   }`}
                 >
                   {d.label}
@@ -202,12 +205,12 @@ export default function LiveLocationShare() {
           </div>
 
           <button
-            onClick={handleStartSharing}
+            onClick={handleStartShare}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 w-full rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-600 py-3.5 text-xs font-bold text-slate-950 shadow-lg shadow-teal-950/60 hover:from-teal-400 hover:to-emerald-500 transition-all"
+            className="w-full py-2.5 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[13px] font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            <Navigation className="h-4 w-4 fill-current" />
-            <span>{isLoading ? 'Creating Session...' : 'Start Sharing Live Location'}</span>
+            <Navigation className="w-4 h-4" />
+            <span>{isLoading ? 'Generating Link...' : `Start Sharing for ${duration} Mins`}</span>
           </button>
         </div>
       )}

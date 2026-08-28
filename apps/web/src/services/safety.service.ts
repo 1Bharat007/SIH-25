@@ -36,6 +36,19 @@ export const safetyService = {
     });
   },
 
+  async createLiveLocationSession(data: {
+    userId?: string;
+    userName?: string;
+    latitude: number;
+    longitude: number;
+    altitudeMeters?: number;
+    accuracyMeters?: number;
+    batteryLevel?: number;
+    durationMinutes?: number;
+  }): Promise<LiveLocationSession> {
+    return this.startLiveLocation(data);
+  },
+
   async getLiveLocation(token: string): Promise<LiveLocationSession> {
     return fetchApi<LiveLocationSession>(`/safety/live-location/${token}`);
   },
@@ -53,6 +66,12 @@ export const safetyService = {
     return fetchApi<LiveLocationSession>(`/safety/live-location/${token}/update`, {
       method: 'POST',
       body: JSON.stringify(coords),
+    });
+  },
+
+  async endLiveLocationSession(token: string): Promise<LiveLocationSession> {
+    return fetchApi<LiveLocationSession>(`/safety/live-location/${token}/end`, {
+      method: 'POST',
     });
   },
 

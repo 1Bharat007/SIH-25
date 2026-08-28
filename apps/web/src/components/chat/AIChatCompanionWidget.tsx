@@ -3,13 +3,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Send,
-  Minimize2,
   Trash2,
   Globe,
   Bot,
   User,
   MapPin,
   Loader2,
+  X,
 } from 'lucide-react';
 import { useAIChatCompanion } from '../../hooks/useAIChatCompanion';
 import LanguagePreferenceModal from './LanguagePreferenceModal';
@@ -20,7 +20,6 @@ export default function AIChatCompanionWidget() {
     isLoading,
     preferredLanguage,
     selectLanguage,
-    hasPromptedLanguage,
     isWidgetOpen,
     setIsWidgetOpen,
     sendMessage,
@@ -28,11 +27,11 @@ export default function AIChatCompanionWidget() {
     userLocation,
   } = useAIChatCompanion();
 
+
   const [inputVal, setInputVal] = useState<string>('');
   const [showLanguageModal, setShowLanguageModal] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
 
   // Auto-scroll on new message
   useEffect(() => {
@@ -58,173 +57,125 @@ export default function AIChatCompanionWidget() {
   };
 
   const currentLangLabel =
-    preferredLanguage === 'hi' ? 'हिन्दी (Hindi)' : preferredLanguage === 'ne' ? 'नेपाली (Nepali)' : 'English';
+    preferredLanguage === 'hi'
+      ? 'हिंदी'
+      : preferredLanguage === 'ne'
+        ? 'नेपाली'
+        : preferredLanguage === 'dz'
+          ? 'Bhutia (Dzongkha)'
+          : preferredLanguage === 'lep'
+            ? 'Lepcha'
+            : 'English';
+
 
   return (
     <>
-      {/* First-time Language Onboarding Modal */}
-      {!hasPromptedLanguage && (
-        <LanguagePreferenceModal
-          isOpen={!hasPromptedLanguage}
-          currentLanguage={preferredLanguage}
-          onSelectLanguage={(lang) => {
-            selectLanguage(lang);
-            setShowLanguageModal(false);
-          }}
-          onClose={() => selectLanguage(preferredLanguage)}
-        />
-      )}
-
-      {/* Manual Language Modal Selector */}
-      {showLanguageModal && (
-        <LanguagePreferenceModal
-          isOpen={showLanguageModal}
-          currentLanguage={preferredLanguage}
-          onSelectLanguage={(lang) => {
-            selectLanguage(lang);
-            setShowLanguageModal(false);
-          }}
-          onClose={() => setShowLanguageModal(false)}
-        />
-      )}
-
-      {/* Floating Chat Trigger Button */}
+      {/* Floating Assistant Trigger Button */}
       {!isWidgetOpen && (
-        <div className="fixed bottom-24 right-5 z-40">
+        <div className="fixed bottom-5 left-5 z-[9980]">
           <button
             onClick={() => setIsWidgetOpen(true)}
-            className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-xs shadow-2xl shadow-teal-950/80 border border-teal-400/40 transition-all hover:scale-105 active:scale-95"
-            title="Open AI Travel Companion"
+            className="flex items-center gap-2 rounded-full border border-[#DADCE0] bg-[#0B3D91] hover:bg-[#082E6E] px-4 py-2.5 text-[#FFFFFF] shadow-[0_2px_6px_0_rgba(60,64,67,0.3)] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0B3D91] cursor-pointer"
+            aria-label="Open Tourism Assistant"
           >
-            <div className="relative">
-              <Bot className="w-5 h-5 text-teal-100" />
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-slate-950 animate-pulse" />
-            </div>
-            <span className="hidden sm:inline font-extrabold tracking-wide text-white">
-              AI Travel Companion
-            </span>
+            <Bot className="h-4 w-4 text-[#FFFFFF]" />
+            <span className="text-[13px] font-medium tracking-wide">Tourist Assistant</span>
           </button>
         </div>
       )}
 
-      {/* Expandable Chat Drawer */}
+      {/* Main Assistant Chat Window */}
       {isWidgetOpen && (
-        <div className="fixed bottom-5 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] h-[580px] max-h-[88vh] rounded-3xl bg-slate-950/95 border border-teal-500/30 shadow-2xl shadow-black/80 backdrop-blur-2xl flex flex-col overflow-hidden animate-fadeIn">
-          {/* Widget Header */}
-          <div className="p-4 bg-gradient-to-r from-teal-950/80 via-slate-900 to-slate-950 border-b border-white/10 flex items-center justify-between gap-3">
+        <div className="fixed bottom-5 left-5 z-[9980] w-[92vw] sm:w-[380px] h-[520px] max-h-[85vh] rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] shadow-2xl flex flex-col overflow-hidden text-[#202124]">
+          {/* Header Bar */}
+          <div className="bg-[#0B3D91] px-4 py-3 text-[#FFFFFF] flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-2xl bg-teal-500/20 text-teal-300 border border-teal-500/40">
-                <Bot className="w-5 h-5" />
+              <div className="w-7 h-7 rounded-[4px] bg-[#FFFFFF]/15 flex items-center justify-center text-[#FFFFFF]">
+                <Bot className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-extrabold text-sm text-white flex items-center gap-1.5">
-                  <span>Sikkim Yatra AI</span>
-                  <span className="px-1.5 py-0.2 text-[9px] font-bold uppercase rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                    Grounded
-                  </span>
+                <h3 className="text-[14px] font-medium leading-none text-[#FFFFFF]">
+                  Sikkim Tourist Assistant
                 </h3>
-                <p className="text-[11px] text-white/50 flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-teal-400" />
-                  <span>
-                    {userLocation ? 'Location Active' : 'Sikkim Grounded'} • Offline-Ready
-                  </span>
-                </p>
+                <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[#D2E3FC]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#81C995]" />
+                  <span>Multilingual Support</span>
+                  {userLocation && (
+                    <span className="flex items-center gap-0.5 ml-1">
+                      <MapPin className="w-3 h-3" />
+                      <span>GPS Context</span>
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Actions: Language & Close */}
-            <div className="flex items-center gap-1.5">
-              {/* Language Switcher Button */}
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => setShowLanguageModal(true)}
-                className="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-teal-300 text-xs font-semibold border border-white/10 flex items-center gap-1 transition-colors"
-                title="Change language"
+                className="p-1.5 rounded-[4px] hover:bg-[#FFFFFF]/10 text-[#D2E3FC] hover:text-[#FFFFFF] text-[11px] flex items-center gap-1"
+                title="Change Language"
               >
-                <Globe className="w-3 h-3 text-teal-400" />
-                <span className="text-[11px]">{currentLangLabel.split(' ')[0]}</span>
+                <Globe className="w-3.5 h-3.5" />
+                <span>{currentLangLabel}</span>
               </button>
 
-              {/* Clear History */}
               <button
-                onClick={clearHistory}
-                className="p-1.5 rounded-xl hover:bg-white/10 text-white/40 hover:text-white/80 transition-colors"
-                title="Clear conversation"
+                onClick={() => clearHistory()}
+                className="p-1.5 rounded-[4px] hover:bg-[#FFFFFF]/10 text-[#D2E3FC] hover:text-[#FFFFFF]"
+                title="Clear Chat"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
 
-              {/* Close Button */}
               <button
                 onClick={() => setIsWidgetOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                title="Minimize chat"
+                className="p-1.5 rounded-[4px] hover:bg-[#FFFFFF]/10 text-[#FFFFFF]"
+                title="Close Window"
               >
-                <Minimize2 className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Messages Stream Body */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-white/10">
+          {/* Messages Stream */}
+          <div className="flex-1 p-3.5 overflow-y-auto space-y-3 bg-[#F8F9FA] text-[13px]">
             {messages.map((msg) => {
               const isUser = msg.role === 'user';
               return (
                 <div
                   key={msg.id}
-                  className={`flex gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
+                  className={`flex items-start gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}
                 >
                   {!isUser && (
-                    <div className="w-7 h-7 rounded-xl bg-teal-500/20 border border-teal-500/30 text-teal-300 flex items-center justify-center flex-shrink-0 mt-1">
-                      <Bot className="w-3.5 h-3.5" />
+                    <div className="w-6 h-6 rounded-[4px] bg-[#0B3D91] text-[#FFFFFF] flex items-center justify-center shrink-0 mt-0.5 text-[11px]">
+                      SY
                     </div>
                   )}
 
                   <div
-                    className={`max-w-[85%] rounded-2xl p-3.5 space-y-2 text-xs leading-relaxed ${
+                    className={`p-3 rounded-[4px] max-w-[82%] leading-relaxed ${
                       isUser
-                        ? 'bg-teal-600 text-white rounded-br-none shadow-md font-medium'
-                        : 'bg-slate-900 border border-white/10 text-white/90 rounded-bl-none shadow-md'
+                        ? 'bg-[#0B3D91] text-[#FFFFFF]'
+                        : 'bg-[#FFFFFF] border border-[#DADCE0] text-[#202124] shadow-xs'
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{msg.content}</p>
-
-                    {/* Source Tag for Bot */}
-                    {!isUser && msg.source && (
-                      <div className="flex items-center justify-between text-[10px] text-white/40 pt-1 border-t border-white/5">
-                        <span className="capitalize">
-                          {msg.source === 'claude_llm'
-                            ? 'Claude AI Grounded'
-                            : msg.source === 'offline_kb'
-                            ? 'Offline Local Cache'
-                            : 'Sikkim Yatra System'}
-                        </span>
-                        <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                    )}
-
-                    {/* Suggested Follow-up chips */}
-                    {!isUser && msg.suggestedFollowUps && msg.suggestedFollowUps.length > 0 && (
-                      <div className="pt-2 border-t border-white/10 space-y-1.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-teal-300 block">
-                          Suggested Inquiries:
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {msg.suggestedFollowUps.map((sugg, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => handleSuggestionClick(sugg)}
-                              className="px-2.5 py-1 rounded-lg text-[10px] bg-white/5 hover:bg-teal-500/20 text-teal-200 hover:text-teal-100 border border-teal-500/20 transition-colors text-left"
-                            >
-                              {sugg}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    <span
+                      className={`block text-[10px] mt-1 ${
+                        isUser ? 'text-[#D2E3FC] text-right' : 'text-[#5F6368]'
+                      }`}
+                    >
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </div>
 
+
                   {isUser && (
-                    <div className="w-7 h-7 rounded-xl bg-white/10 text-white/80 flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-6 h-6 rounded-[4px] bg-[#E8F0FE] text-[#0B3D91] flex items-center justify-center shrink-0 mt-0.5 text-[11px]">
                       <User className="w-3.5 h-3.5" />
                     </div>
                   )}
@@ -232,14 +183,14 @@ export default function AIChatCompanionWidget() {
               );
             })}
 
-            {/* Typing Loader */}
             {isLoading && (
-              <div className="flex gap-2.5 items-center text-xs text-teal-300 animate-pulse">
-                <div className="w-7 h-7 rounded-xl bg-teal-500/20 border border-teal-500/30 text-teal-300 flex items-center justify-center flex-shrink-0">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <div className="flex items-start gap-2">
+                <div className="w-6 h-6 rounded-[4px] bg-[#0B3D91] text-[#FFFFFF] flex items-center justify-center shrink-0">
+                  <Bot className="w-3.5 h-3.5" />
                 </div>
-                <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-white/60 text-xs">
-                  Sikkim Yatra AI is synthesizing response...
+                <div className="p-3 rounded-[4px] bg-[#FFFFFF] border border-[#DADCE0] text-[#5F6368] flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0B3D91]" />
+                  <span className="text-[12px]">Consulting knowledge base...</span>
                 </div>
               </div>
             )}
@@ -247,36 +198,62 @@ export default function AIChatCompanionWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Bar */}
+          {/* Quick FAQ Suggestion Chips */}
+          <div className="px-3 py-2 bg-[#FFFFFF] border-t border-[#DADCE0] flex items-center gap-1.5 overflow-x-auto text-[11px]">
+            <button
+              onClick={() => handleSuggestionClick('How to get Nathula Pass permit?')}
+              className="whitespace-nowrap px-2.5 py-1 rounded-full border border-[#DADCE0] bg-[#F8F9FA] hover:bg-[#E8F0FE] text-[#5F6368] hover:text-[#0B3D91] transition-colors"
+            >
+              Nathula Permit?
+            </button>
+            <button
+              onClick={() => handleSuggestionClick('Where can I rent traditional Bhutia Bakhu?')}
+              className="whitespace-nowrap px-2.5 py-1 rounded-full border border-[#DADCE0] bg-[#F8F9FA] hover:bg-[#E8F0FE] text-[#5F6368] hover:text-[#0B3D91] transition-colors"
+            >
+              Rent Bakhu Outfit?
+            </button>
+            <button
+              onClick={() => handleSuggestionClick('Emergency contact numbers in Gangtok')}
+              className="whitespace-nowrap px-2.5 py-1 rounded-full border border-[#DADCE0] bg-[#F8F9FA] hover:bg-[#E8F0FE] text-[#5F6368] hover:text-[#0B3D91] transition-colors"
+            >
+              Emergency Helpline
+            </button>
+          </div>
+
+          {/* Input Form */}
           <form
             onSubmit={handleSend}
-            className="p-3 bg-slate-900 border-t border-white/10 flex items-center gap-2"
+            className="p-2.5 bg-[#FFFFFF] border-t border-[#DADCE0] flex items-center gap-2"
           >
             <input
               ref={inputRef}
               type="text"
               value={inputVal}
               onChange={(e) => setInputVal(e.target.value)}
-              placeholder={
-                preferredLanguage === 'hi'
-                  ? 'सिक्किम के बारे में कुछ भी पूछें...'
-                  : preferredLanguage === 'ne'
-                  ? 'सिक्किमको बारेमा केही सोध्नुहोस्...'
-                  : 'Ask about permits, roads, monasteries...'
-              }
-              className="flex-1 px-3.5 py-2.5 rounded-xl bg-black/40 border border-white/15 text-white text-xs placeholder-white/40 focus:outline-none focus:border-teal-400"
+              placeholder="Ask anything about Sikkim..."
+              className="flex-1 h-9 px-3 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] text-[13px] text-[#202124] placeholder-[#80868B] focus:outline-none focus:border-[#0B3D91]"
             />
-
             <button
               type="submit"
               disabled={!inputVal.trim() || isLoading}
-              className="p-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 disabled:opacity-40 disabled:hover:bg-teal-500 text-slate-950 font-bold transition-all flex items-center justify-center"
-              title="Send message"
+              className="h-9 px-3 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[12px] font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5" />
             </button>
           </form>
         </div>
+      )}
+
+      {/* Language Selection Modal */}
+      {showLanguageModal && (
+        <LanguagePreferenceModal
+          currentLanguage={preferredLanguage}
+          onSelectLanguage={(lang) => {
+            selectLanguage(lang);
+            setShowLanguageModal(false);
+          }}
+          onClose={() => setShowLanguageModal(false)}
+        />
       )}
     </>
   );

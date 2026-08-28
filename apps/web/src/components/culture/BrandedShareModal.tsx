@@ -6,7 +6,6 @@ import {
   Download,
   Share2,
   Check,
-  Sparkles,
   Store,
   Copy,
 } from 'lucide-react';
@@ -35,7 +34,7 @@ export default function BrandedShareModal({
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
 
-  // Generate Branded Postcard Canvas
+  // Generate Branded Postcard Canvas (1080 x 1350 px)
   const generateBrandedPostcard = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -49,118 +48,82 @@ export default function BrandedShareModal({
     });
 
     const targetWidth = 1080;
-    const targetHeight = 1350; // 4:5 Instagram Portrait Ratio
+    const targetHeight = 1350; // 4:5 Portrait Ratio
 
     canvas.width = targetWidth;
     canvas.height = targetHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // 1. Dark Gradient Background with Himalayan Motif
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, targetHeight);
-    bgGradient.addColorStop(0, '#020617');
-    bgGradient.addColorStop(0.5, '#0f172a');
-    bgGradient.addColorStop(1, '#022c22');
-    ctx.fillStyle = bgGradient;
+    // 1. Clean Deep Navy & White Postcard Background
+    ctx.fillStyle = '#0B3D91';
     ctx.fillRect(0, 0, targetWidth, targetHeight);
 
-    // 2. Draw Main AR Snapshot into center frame
-    const framePadding = 50;
-    const frameTop = 130;
-    const frameWidth = targetWidth - framePadding * 2;
-    const frameHeight = targetHeight - frameTop - 250;
+    // Subtle decorative accents
+    ctx.fillStyle = '#082E6E';
+    ctx.fillRect(0, 0, targetWidth, 140);
+    ctx.fillStyle = '#062252';
+    ctx.fillRect(0, targetHeight - 200, targetWidth, 200);
 
-    // Draw inner snapshot with aspect-fill
-    ctx.save();
-    // Rounded clip
-    ctx.beginPath();
-    ctx.roundRect(framePadding, frameTop, frameWidth, frameHeight, 32);
-    ctx.clip();
+    // 2. Top Header & Government Branding
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '500 36px "Google Sans", "Roboto", sans-serif';
+    ctx.fillText('SIKKIM YATRA • CULTURAL HERITAGE', 60, 75);
 
-    // Scale image to fill frame
-    const imgRatio = img.width / img.height;
-    const frameRatio = frameWidth / frameHeight;
-    let renderW = frameWidth;
-    let renderH = frameHeight;
-    let renderX = framePadding;
-    let renderY = frameTop;
+    ctx.fillStyle = '#D2E3FC';
+    ctx.font = '400 22px "Google Sans", "Roboto", sans-serif';
+    ctx.fillText('Government of Sikkim • Tourism & Civil Aviation Department', 60, 112);
 
-    if (imgRatio > frameRatio) {
-      renderW = frameHeight * imgRatio;
-      renderX = framePadding - (renderW - frameWidth) / 2;
-    } else {
-      renderH = frameWidth / imgRatio;
-      renderY = frameTop - (renderH - frameHeight) / 2;
+    // 3. User AR Snapshot Photo Frame
+    const frameX = 60;
+    const frameY = 165;
+    const frameW = 960;
+    const frameH = 920;
+
+    // Outer Frame Border
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(frameX - 6, frameY - 6, frameW + 12, frameH + 12);
+
+    // Draw Captured Video Frame
+    ctx.drawImage(img, frameX, frameY, frameW, frameH);
+
+    // 4. Bottom Information Panel
+    const infoY = 1175;
+
+    // Garment Name & Community Badge
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '500 38px "Google Sans", "Roboto", sans-serif';
+    ctx.fillText(garment.name, 60, infoY);
+
+    ctx.fillStyle = '#8AB4F8';
+    ctx.font = '400 24px "Google Sans", "Roboto", sans-serif';
+    const subtext = `${garment.community} Traditional Attire${
+      garment.nativeName ? ` (${garment.nativeName})` : ''
+    }`;
+    ctx.fillText(subtext, 60, infoY + 40);
+
+    // Layers Subtitle
+    if (layer || headgear) {
+      const accessoryText = [layer?.name, headgear?.name].filter(Boolean).join(' + ');
+      ctx.fillStyle = '#D2E3FC';
+      ctx.font = '400 20px "Google Sans", "Roboto", sans-serif';
+      ctx.fillText(`Accessories: ${accessoryText}`, 60, infoY + 74);
     }
 
-    ctx.drawImage(img, renderX, renderY, renderW, renderH);
-    ctx.restore();
-
-    // 3. Draw Golden Border around the photo frame
-    ctx.strokeStyle = '#10b981';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.roundRect(framePadding, frameTop, frameWidth, frameHeight, 32);
-    ctx.stroke();
-
-    // 4. Header Bar
-    ctx.fillStyle = '#10b981';
-    ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-    ctx.letterSpacing = '3px';
-    ctx.textAlign = 'center';
-    ctx.fillText('SIKKIM YATRA • CULTURAL AR STUDIO', targetWidth / 2, 70);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '16px system-ui, -apple-system, sans-serif';
-    ctx.letterSpacing = '1px';
-    ctx.fillText('Living Himalayan Heritage & Authentic Traditional Attire', targetWidth / 2, 100);
-
-    // 5. Bottom Informational Card Bar
-    const cardY = targetHeight - 210;
-
-    // Dark pill container
-    ctx.fillStyle = 'rgba(2, 6, 23, 0.92)';
-    ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.roundRect(framePadding, cardY, frameWidth, 160, 24);
-    ctx.fill();
-    ctx.stroke();
-
-    // Outfit Details Text
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = 'bold 30px system-ui, -apple-system, sans-serif';
-    ctx.fillText(garment.name, framePadding + 32, cardY + 50);
-
-    ctx.fillStyle = '#34d399';
-    ctx.font = 'bold 18px system-ui, -apple-system, sans-serif';
-    let subtext = `${garment.community} Community`;
-    if (garment.nativeName) subtext += ` • ${garment.nativeName}`;
-    if (headgear) subtext += ` + ${headgear.name}`;
-    if (layer) subtext += ` + ${layer.name}`;
-    ctx.fillText(subtext, framePadding + 32, cardY + 84);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '15px system-ui, -apple-system, sans-serif';
-    ctx.fillText(
-      `Tried on via Sikkim Yatra AR • Support Local Artisans in ${garment.craftNotes?.producingRegion || 'Sikkim'}`,
-      framePadding + 32,
-      cardY + 120
-    );
-
-    // Verified Stamp Badge on bottom right
+    // Official QR / Watermark Text
     ctx.textAlign = 'right';
-    ctx.fillStyle = '#10b981';
-    ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
-    ctx.fillText('SIKKIM TOURISM', targetWidth - framePadding - 32, cardY + 60);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '500 24px "Google Sans", "Roboto", sans-serif';
+    ctx.fillText('sikkimyatra.in/culture', targetWidth - 60, infoY + 15);
 
-    ctx.fillStyle = '#e2e8f0';
-    ctx.font = '12px system-ui, -apple-system, sans-serif';
-    ctx.fillText('Verified Heritage', targetWidth - framePadding - 32, cardY + 85);
+    ctx.fillStyle = '#8AB4F8';
+    ctx.font = '400 18px "Google Sans", "Roboto", sans-serif';
+    ctx.fillText('Certified Handloom Weavers', targetWidth - 60, infoY + 45);
+    ctx.fillText('Direct Artisan Multiplier', targetWidth - 60, infoY + 72);
+    ctx.textAlign = 'left';
 
-    const generated = canvas.toDataURL('image/png', 0.95);
-    setBrandedDataUrl(generated);
+    const url = canvas.toDataURL('image/png', 0.95);
+    setBrandedDataUrl(url);
   }, [rawSnapshotDataUrl, garment, headgear, layer]);
 
   useEffect(() => {
@@ -172,162 +135,153 @@ export default function BrandedShareModal({
     if (!brandedDataUrl) return;
     const a = document.createElement('a');
     a.href = brandedDataUrl;
-    a.download = `Sikkim_Yatra_Heritage_${garment.categorySlug}_${Date.now()}.png`;
+    a.download = `Sikkim_Yatra_${garment.name.replace(/\s+/g, '_')}_Postcard.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   };
 
   // Handle Native Web Share API
-  const handleNativeShare = async () => {
+  const handleShare = async () => {
     if (!brandedDataUrl) return;
 
     try {
-      // Convert dataUrl to Blob
       const res = await fetch(brandedDataUrl);
       const blob = await res.blob();
-      const file = new File([blob], `Sikkim_AR_${garment.id}.png`, { type: 'image/png' });
+      const file = new File([blob], `Sikkim_AR_${garment.name}.png`, {
+        type: 'image/png',
+      });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: `My Traditional ${garment.name} - Sikkim Yatra`,
-          text: `Just tried on authentic ${garment.community} traditional wear (${garment.name}) using Sikkim Yatra's AR Heritage Studio! Explore Sikkim's living culture:`,
-          url: window.location.href,
+          title: `Tried on ${garment.name} on Sikkim Yatra`,
+          text: `Exploring authentic ${garment.community} traditional wear in Sikkim! Support local weavers and artisans directly.`,
           files: [file],
+          url: 'https://sikkimyatra.in/culture',
         });
         setShareSuccess(true);
         setTimeout(() => setShareSuccess(false), 3000);
       } else if (navigator.share) {
         await navigator.share({
-          title: `My Traditional ${garment.name} - Sikkim Yatra`,
-          text: `Just tried on authentic ${garment.community} traditional wear (${garment.name}) using Sikkim Yatra's AR Heritage Studio!`,
-          url: window.location.href,
+          title: `Tried on ${garment.name} on Sikkim Yatra`,
+          text: `Exploring authentic ${garment.community} traditional wear in Sikkim!`,
+          url: 'https://sikkimyatra.in/culture',
         });
+        setShareSuccess(true);
+        setTimeout(() => setShareSuccess(false), 3000);
       } else {
-        // Fallback: Copy link
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(
+          `I tried on the traditional ${garment.name} (${garment.community} community) on Sikkim Yatra! Check it out: https://sikkimyatra.in/culture`
+        );
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 3000);
       }
     } catch {
-      // Ignore user abort or fallback
+      // User cancelled share
     }
   };
 
-  // Handle Copy Postcard Image to Clipboard
-  const handleCopyImage = async () => {
-    if (!brandedDataUrl) return;
-
+  // Copy Link to Clipboard
+  const handleCopyLink = async () => {
     try {
-      const res = await fetch(brandedDataUrl);
-      const blob = await res.blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'image/png': blob,
-        }),
-      ]);
+      await navigator.clipboard.writeText(
+        `Check out traditional ${garment.name} on Sikkim Yatra Cultural Heritage Studio: https://sikkimyatra.in/culture/ar-demo`
+      );
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 3000);
     } catch {
-      // Fallback copy link
-      await navigator.clipboard.writeText(window.location.href);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 3000);
+      // ignore
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
-      {/* Hidden Offscreen Generator Canvas */}
-      <canvas ref={canvasRef} className="hidden" />
+    <div className="fixed inset-0 z-50 bg-[#000000]/50 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="relative w-full max-w-2xl rounded-[8px] border border-[#DADCE0] bg-[#FFFFFF] p-5 sm:p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+        <canvas ref={canvasRef} className="hidden" />
 
-      <div className="relative w-full max-w-2xl rounded-3xl border border-emerald-500/30 bg-slate-900/95 p-5 sm:p-7 shadow-2xl space-y-6">
-        {/* Top Modal Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-extrabold text-white">
-                Share Your Sikkimese Heritage Postcard
-              </h3>
-              <p className="text-xs text-slate-400">
-                Stitched with authentic {garment.community} motifs & tourism watermark
-              </p>
-            </div>
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-[#DADCE0] pb-3">
+          <div>
+            <h3 className="text-[16px] font-medium text-[#202124]">
+              Branded Cultural Heritage Postcard
+            </h3>
+            <p className="text-[12px] text-[#5F6368]">
+              Tourism certified postcard with authentic community attribution
+            </p>
           </div>
-
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+            className="p-1 rounded-[4px] text-[#5F6368] hover:text-[#202124] hover:bg-[#F8F9FA]"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Postcard Image Preview */}
-        <div className="relative w-full aspect-[4/5] max-h-[460px] rounded-2xl overflow-hidden border border-emerald-500/30 bg-black shadow-inner flex items-center justify-center">
+        {/* Postcard Live Preview Container */}
+        <div className="rounded-[4px] overflow-hidden border border-[#DADCE0] bg-[#F8F9FA] flex items-center justify-center p-3">
           {brandedDataUrl ? (
             <img
               src={brandedDataUrl}
               alt="Branded Sikkim Postcard"
-              className="w-full h-full object-contain"
+              className="max-h-[460px] w-auto object-contain rounded-[4px] shadow-sm"
             />
           ) : (
-            <div className="flex flex-col items-center gap-2 text-slate-400 text-xs">
-              <div className="w-8 h-8 rounded-full border-2 border-emerald-500/30 border-t-emerald-400 animate-spin" />
-              <span>Generating High-Res Postcard Frame...</span>
+            <div className="py-20 text-center space-y-2">
+              <div className="w-6 h-6 rounded-full border-2 border-[#DADCE0] border-t-[#0B3D91] animate-spin mx-auto" />
+              <p className="text-[12px] text-[#5F6368]">Rendering branded frame...</p>
             </div>
           )}
         </div>
 
-        {/* Share & Download Actions */}
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Native Share Button */}
-            <button
-              onClick={handleNativeShare}
-              className="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>{shareSuccess ? 'Shared!' : 'Share to Instagram / WhatsApp'}</span>
-            </button>
-
-            {/* Download Postcard Button */}
-            <button
-              onClick={handleDownload}
-              className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Download className="w-4 h-4 text-emerald-400" />
-              <span>Download Postcard (PNG)</span>
-            </button>
+        {/* Local Artisan Hook Notice */}
+        <div className="p-3 rounded-[4px] bg-[#E8F0FE] border border-[#D2E3FC] flex items-start justify-between gap-3">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1.5 text-[13px] font-medium text-[#0B3D91]">
+              <Store className="w-3.5 h-3.5" />
+              <span>Interested in wearing this outfit in real life?</span>
+            </div>
+            <p className="text-[12px] text-[#5F6368]">
+              Directly rent or purchase from verified local weavers and cooperatives across Sikkim.
+            </p>
           </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            {/* Copy Button */}
+          {onExploreVendors && (
             <button
-              onClick={handleCopyImage}
-              className="flex items-center gap-1.5 text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-950/60 border border-white/10 transition-all"
+              onClick={() => {
+                onClose();
+                onExploreVendors();
+              }}
+              className="px-3 py-1.5 rounded-[4px] bg-[#0B3D91] text-[#FFFFFF] text-[12px] font-medium hover:bg-[#082E6E] shrink-0"
             >
-              {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{isCopied ? 'Copied to Clipboard!' : 'Copy Image to Clipboard'}</span>
+              View Artisans
             </button>
+          )}
+        </div>
 
-            {/* Link to Local Artisans */}
-            {onExploreVendors && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onExploreVendors();
-                }}
-                className="flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-semibold transition-all"
-              >
-                <Store className="w-3.5 h-3.5" />
-                <span>Buy / Rent this outfit from local weavers →</span>
-              </button>
-            )}
-          </div>
+        {/* Modal Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-[#DADCE0]">
+          <button
+            onClick={handleShare}
+            className="flex-1 py-2 px-4 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[13px] font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            {shareSuccess ? <Check className="w-4 h-4 text-[#FFFFFF]" /> : <Share2 className="w-4 h-4" />}
+            <span>{shareSuccess ? 'Shared Successfully' : 'Share Postcard'}</span>
+          </button>
+
+          <button
+            onClick={handleDownload}
+            className="py-2 px-4 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] hover:bg-[#F8F9FA] text-[#0B3D91] text-[13px] font-medium transition-colors flex items-center justify-center gap-1.5"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download PNG</span>
+          </button>
+
+          <button
+            onClick={handleCopyLink}
+            className="py-2 px-4 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] hover:bg-[#F8F9FA] text-[#5F6368] hover:text-[#202124] text-[13px] font-medium transition-colors flex items-center justify-center gap-1.5"
+          >
+            {isCopied ? <Check className="w-4 h-4 text-[#1E8E3E]" /> : <Copy className="w-4 h-4" />}
+            <span>{isCopied ? 'Link Copied' : 'Copy Link'}</span>
+          </button>
         </div>
       </div>
     </div>

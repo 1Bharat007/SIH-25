@@ -319,7 +319,8 @@ export default function AttireTryOnStudio({
       ctx.fillRect(16, height - 54, 340, 38);
       ctx.fillStyle = '#fef08a';
       ctx.font = 'bold 14px sans-serif';
-      ctx.fillText(`🏔️ Sikkim Yatra • ${activeAttire?.name || 'Traditional Attire'}`, 28, height - 30);
+      ctx.fillText(`Sikkim Yatra • ${activeAttire?.name || 'Traditional Attire'}`, 28, height - 30);
+
 
       animFrameRef.current = requestAnimationFrame(renderLoop);
     };

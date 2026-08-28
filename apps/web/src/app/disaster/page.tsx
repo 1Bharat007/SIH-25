@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
-  ShieldAlert,
   AlertTriangle,
   Compass,
   Building2,
@@ -13,7 +12,9 @@ import {
   MapPin,
   CheckCircle2,
   Activity,
+  ArrowLeft,
   ArrowRight,
+  Shield,
 } from 'lucide-react';
 import {
   SafeRouteDetour,
@@ -62,12 +63,9 @@ export default function DisasterCenterPage() {
   const [activeGuidelineType, setActiveGuidelineType] = useState<DisasterType>('landslide');
   const [selectedDetourForModal, setSelectedDetourForModal] = useState<SafeRouteDetour | null>(null);
 
-
   const {
-    alerts,
     activeAlerts,
     connectionStatus,
-    refreshAlerts,
   } = useRealtimeAlerts();
 
   const {
@@ -102,139 +100,137 @@ export default function DisasterCenterPage() {
     guidelines.find((g) => g.hazardType === activeGuidelineType) || guidelines[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-100 pb-20">
-      {/* Top Banner Header */}
-      <div className="relative border-b border-white/10 bg-gradient-to-r from-red-950/60 via-slate-900/90 to-slate-950 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-300 border border-red-500/30">
-                  <Radio className="w-3.5 h-3.5 animate-pulse" />
-                  SSDMA Real-Time Disaster Center
-                </span>
-
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  {connectionStatus === 'connected'
-                    ? 'WebSocket Stream Live'
-                    : 'Real-time Polling Stream'}
-                </span>
-              </div>
-
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Sikkim Mountain Hazard & Disaster Response Hub
-              </h1>
-              <p className="text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
-                Official real-time disaster management network. Monitor landslides, road blockades, Teesta GLOF flood warnings, and discover alternate safe bypass routes.
-              </p>
+    <div className="min-h-screen bg-[#F8F9FA] text-[#202124] pb-16">
+      {/* Top Header Card */}
+      <div className="bg-[#FFFFFF] border-b border-[#DADCE0]">
+        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-[12px] text-[#5F6368]">
+              <Link href="/" className="text-[#0B3D91] hover:underline font-medium flex items-center gap-1">
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Portal Overview</span>
+              </Link>
+              <span>/</span>
+              <span className="text-[#202124] font-medium">SSDMA Disaster Management</span>
             </div>
 
-            {/* Quick Action Box */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#E6F4EA] text-[#137333] border border-[#CEEAD6]">
+                <span className="w-2 h-2 rounded-full bg-[#1E8E3E] animate-pulse" />
+                {connectionStatus === 'connected' ? 'WebSocket Stream Live' : 'Polling Active'}
+              </span>
+
               <Link
                 href="/safety"
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs shadow-xl shadow-red-600/30 transition-all flex items-center justify-center gap-2 border border-red-400/40"
+                className="px-3 py-1.5 rounded-[4px] bg-[#D93025] hover:bg-[#C5221F] text-[#FFFFFF] text-[12px] font-medium transition-colors"
               >
-                <ShieldAlert className="w-4 h-4 animate-pulse" />
-                <span>Emergency SOS Module</span>
+                Emergency SOS
               </Link>
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex overflow-x-auto gap-2 mt-8 pt-4 border-t border-white/10 scrollbar-none">
+          <div className="space-y-1">
+            <h1 className="text-[22px] font-medium text-[#202124] leading-tight">
+              Sikkim Mountain Hazard & Disaster Response Hub
+            </h1>
+            <p className="text-[14px] text-[#5F6368] max-w-3xl leading-relaxed">
+              Official real-time disaster management network. Monitor landslides, road blockades, Teesta GLOF flood warnings, and discover alternate safe bypass routes.
+            </p>
+          </div>
+
+          {/* Navigation Tabs (Google Outlined Pill Style) */}
+          <div className="flex overflow-x-auto gap-2 pt-2 border-t border-[#DADCE0] scrollbar-none text-[13px]">
             <button
               onClick={() => setActiveTab('hazards_map')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-full border transition-colors font-medium flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'hazards_map'
-                  ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                  : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                  ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                  : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA] hover:text-[#202124]'
               }`}
             >
-              <AlertTriangle className="w-4 h-4" />
+              <AlertTriangle className="w-3.5 h-3.5" />
               <span>Live Hazards & Map ({activeAlerts.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('safe_detours')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-full border transition-colors font-medium flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'safe_detours'
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
-                  : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                  ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                  : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA] hover:text-[#202124]'
               }`}
             >
-              <Compass className="w-4 h-4" />
-              <span>Safe-Route Detours ({detours.length})</span>
+              <Compass className="w-3.5 h-3.5" />
+              <span>Safe Detours ({detours.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('evacuation')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-full border transition-colors font-medium flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'evacuation'
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                  : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                  ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                  : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA] hover:text-[#202124]'
               }`}
             >
-              <Activity className="w-4 h-4" />
+              <Activity className="w-3.5 h-3.5" />
               <span>Evacuation Protocols</span>
             </button>
 
             <button
               onClick={() => setActiveTab('shelters')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-full border transition-colors font-medium flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'shelters'
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                  : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                  ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                  : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA] hover:text-[#202124]'
               }`}
             >
-              <Building2 className="w-4 h-4" />
+              <Building2 className="w-3.5 h-3.5" />
               <span>Emergency Shelters ({shelters.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('admin')}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 flex-shrink-0 ${
+              className={`px-3.5 py-1.5 rounded-full border transition-colors font-medium flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'admin'
-                  ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
-                  : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white'
+                  ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                  : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA] hover:text-[#202124]'
               }`}
             >
-              <Radio className="w-4 h-4" />
+              <Radio className="w-3.5 h-3.5" />
               <span>Admin Broadcast Console</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Main Tab Content Area */}
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      {/* Main Tab Content */}
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
         {/* TAB 1: LIVE HAZARDS & MAP */}
         {activeTab === 'hazards_map' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* GPS Simulation Toolbar */}
-            <div className="p-4 rounded-2xl bg-slate-900 border border-white/10 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="p-3.5 rounded-[8px] bg-[#FFFFFF] border border-[#DADCE0] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 text-[12px]">
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs text-white/80 font-medium">
-                  Traveler Simulated Location: <strong className="text-white">{activePresetName}</strong>
+                <MapPin className="w-4 h-4 text-[#0B3D91]" />
+                <span className="text-[#5F6368]">
+                  Simulated Position: <strong className="text-[#202124]">{activePresetName}</strong>
                 </span>
                 {distanceKm !== null && (
-                  <span className="text-xs text-amber-300 font-bold ml-2">
-                    ({distanceKm} km from nearest hazard)
+                  <span className="text-[#B06000] font-medium ml-1">
+                    ({distanceKm} km to nearest hazard)
                   </span>
                 )}
               </div>
 
-              <div className="flex items-center gap-2 overflow-x-auto">
+              <div className="flex items-center gap-1.5 overflow-x-auto">
                 {presets.map((preset) => (
                   <button
                     key={preset.name}
                     onClick={() => selectPresetLocation(preset)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all flex-shrink-0 ${
+                    className={`px-2.5 py-1 rounded-[4px] text-[11px] font-medium border transition-colors ${
                       activePresetName === preset.name
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-white/5 hover:bg-white/10 text-white/70'
+                        ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                        : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA]'
                     }`}
                   >
                     {preset.name.split(' ')[0]}
@@ -242,7 +238,7 @@ export default function DisasterCenterPage() {
                 ))}
                 <button
                   onClick={() => enableLiveGps()}
-                  className="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-[11px] font-semibold flex-shrink-0"
+                  className="px-2.5 py-1 rounded-[4px] bg-[#1A73E8] hover:bg-[#185ABC] text-[#FFFFFF] text-[11px] font-medium transition-colors"
                 >
                   Live GPS
                 </button>
@@ -250,7 +246,7 @@ export default function DisasterCenterPage() {
             </div>
 
             {/* Interactive Hazard Map */}
-            <div className="rounded-2xl overflow-hidden border border-white/15 bg-slate-900 shadow-2xl relative h-[480px]">
+            <div className="rounded-[8px] overflow-hidden border border-[#DADCE0] bg-[#FFFFFF] shadow-sm relative h-[440px]">
               {typeof window !== 'undefined' && (
                 <MapContainer
                   center={[27.45, 88.55]}
@@ -263,7 +259,7 @@ export default function DisasterCenterPage() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
 
-                  {/* Active Hazard Danger Circles */}
+                  {/* Active Hazard Circles */}
                   {activeAlerts.map((alert) => {
                     const isCrit = alert.severity === 'critical' || alert.severity === 'high';
                     return (
@@ -272,56 +268,50 @@ export default function DisasterCenterPage() {
                         center={[alert.centerLat, alert.centerLng]}
                         radius={(alert.radiusKm || 5) * 1000}
                         pathOptions={{
-                          color: isCrit ? '#ef4444' : '#f59e0b',
-                          fillColor: isCrit ? '#dc2626' : '#d97706',
-                          fillOpacity: 0.35,
-                          weight: 3,
+                          color: isCrit ? '#D93025' : '#E37400',
+                          fillColor: isCrit ? '#D93025' : '#E37400',
+                          fillOpacity: 0.3,
+                          weight: 2,
                         }}
                       >
                         <Popup>
-                          <div className="p-2 text-xs">
-                            <span className="font-bold text-red-600 uppercase block">
-                              {alert.type.toUpperCase()}: {alert.severity.toUpperCase()}
-                            </span>
-                            <strong className="block mt-1">{alert.title}</strong>
+                          <div className="p-1 text-xs">
+                            <strong className="text-red-700 block">{alert.title}</strong>
                             <p className="text-slate-700 mt-1">{alert.affectedCorridor}</p>
-                            <p className="text-slate-600 text-[11px] mt-1 italic">
-                              {alert.recommendedAction}
-                            </p>
+                            <p className="text-slate-600 text-[11px] mt-1">{alert.recommendedAction}</p>
                           </div>
                         </Popup>
                       </Circle>
                     );
                   })}
 
-                  {/* User Location Marker */}
+                  {/* User Marker */}
                   <Circle
                     center={[currentCoords.lat, currentCoords.lng]}
                     radius={500}
-                    pathOptions={{ color: '#3b82f6', fillColor: '#60a5fa', fillOpacity: 0.9 }}
+                    pathOptions={{ color: '#0B3D91', fillColor: '#1A73E8', fillOpacity: 0.8 }}
                   >
                     <Popup>
-                      <div className="p-2 text-xs">
-                        <strong>Traveler Position</strong>
-                        <p className="text-slate-600">{activePresetName}</p>
+                      <div className="p-1 text-xs">
+                        <strong>Current Position</strong>
+                        <p>{activePresetName}</p>
                       </div>
                     </Popup>
                   </Circle>
-
                 </MapContainer>
               )}
             </div>
 
             {/* Filter Pills */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-1.5 overflow-x-auto text-[12px]">
               {['all', 'landslide', 'heavy_snowfall', 'flash_flood', 'road_closure'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setSelectedHazardFilter(type)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all capitalize flex-shrink-0 ${
+                  className={`px-3 py-1 rounded-full border transition-colors font-medium capitalize shrink-0 ${
                     selectedHazardFilter === type
-                      ? 'bg-white text-slate-950 font-bold'
-                      : 'bg-slate-900 border border-white/10 text-white/70 hover:text-white'
+                      ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                      : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA]'
                   }`}
                 >
                   {type.replace('_', ' ')}
@@ -329,346 +319,180 @@ export default function DisasterCenterPage() {
               ))}
             </div>
 
-            {/* Active Hazard Cards Feed */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Active Hazard Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               {filteredAlerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className="p-5 rounded-2xl bg-slate-900 border border-white/10 shadow-xl space-y-3 hover:border-red-500/40 transition-all"
+                  className="p-4 rounded-[8px] bg-[#FFFFFF] border border-[#DADCE0] shadow-xs space-y-2.5 hover:shadow-sm transition-shadow"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/40">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                          alert.severity === 'critical' || alert.severity === 'high'
+                            ? 'bg-[#FCE8E6] text-[#C5221F] border-[#FAD2CF]'
+                            : 'bg-[#FEF7E0] text-[#B06000] border-[#FEEFC3]'
+                        }`}
+                      >
                         {alert.severity}
                       </span>
-                      <span className="text-xs text-white/50">{alert.district} District</span>
+                      <span className="text-[11px] text-[#5F6368]">{alert.district} District</span>
                     </div>
-                    <span className="text-[11px] text-white/40">Radius: {alert.radiusKm} km</span>
+                    <span className="text-[11px] text-[#5F6368]">Radius: {alert.radiusKm} km</span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white leading-tight">{alert.title}</h3>
-                  <p className="text-xs text-amber-200 font-medium">{alert.affectedCorridor}</p>
-                  <p className="text-xs text-white/70 leading-relaxed">{alert.description}</p>
+                  <h3 className="text-[14px] font-medium text-[#202124] leading-snug">{alert.title}</h3>
+                  <p className="text-[12px] font-medium text-[#0B3D91]">{alert.affectedCorridor}</p>
+                  <p className="text-[12px] text-[#5F6368] leading-relaxed">{alert.description}</p>
 
-                  <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-xs text-white/90">
-                    <strong className="text-emerald-300 block mb-0.5">Advisory Action:</strong>
+                  <div className="pt-2 border-t border-[#DADCE0] text-[11px] text-[#5F6368]">
+                    <span className="font-medium text-[#202124]">Advisory: </span>
                     {alert.recommendedAction}
                   </div>
-
-                  {alert.alternateRouteId && (
-                    <button
-                      onClick={() => {
-                        const d = detours.find((item) => item.id === alert.alternateRouteId);
-                        if (d) setSelectedDetourForModal(d);
-                      }}
-                      className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow"
-                    >
-                      <Compass className="w-3.5 h-3.5" />
-                      <span>View Safe Detour Route</span>
-                    </button>
-                  )}
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* TAB 2: SAFE-ROUTE DETOUR NAVIGATOR */}
+        {/* TAB 2: SAFE DETOURS */}
         {activeTab === 'safe_detours' && (
-          <div className="space-y-6">
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-slate-950 border border-emerald-500/30">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Compass className="w-5 h-5 text-emerald-400" />
-                Himalayan Safe Detour Navigation Engine
-              </h3>
-              <p className="text-xs text-white/70 mt-1 max-w-2xl">
-                When major arteries like NH10 or high passes are blocked by rockfall or snow, our data-driven engine provides verified alternate bypass routes with checkpoint waypoints.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {detours.map((detour) => (
                 <div
                   key={detour.id}
-                  className="p-5 rounded-2xl bg-slate-900 border border-emerald-500/30 shadow-xl space-y-4 hover:border-emerald-400 transition-all flex flex-col justify-between"
+                  className="p-4 rounded-[8px] bg-[#FFFFFF] border border-[#DADCE0] shadow-xs space-y-3 flex flex-col justify-between"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        {detour.roadStatus.replace('_', ' ')}
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#E6F4EA] text-[#137333] border border-[#CEEAD6]">
+                        Verified Safe Bypass
                       </span>
-                      <span className="text-xs text-amber-400 font-bold">
-                        ★ {detour.safetyRating.toFixed(1)}/5.0
+                      <span className="text-[11px] text-[#5F6368]">
+                        +{detour.detourDistanceKm} km detour
                       </span>
                     </div>
 
-                    <h4 className="text-base font-bold text-white leading-tight">{detour.title}</h4>
-
-                    <div className="text-xs text-red-300 bg-red-950/40 p-2.5 rounded-xl border border-red-500/20">
-                      <strong className="text-red-400 block text-[10px] uppercase">
-                        Avoids Blocked Corridor:
-                      </strong>
-                      {detour.blockedCorridor}
-                    </div>
-
-                    <p className="text-xs text-white/70 leading-relaxed line-clamp-3">
-                      {detour.overview}
+                    <h3 className="text-[15px] font-medium text-[#202124]">{detour.title}</h3>
+                    <p className="text-[12px] text-[#C5221F] font-medium">
+                      Bypassing: {detour.blockedCorridor}
                     </p>
-
-                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/10 text-center text-xs">
-                      <div className="p-2 rounded-lg bg-black/30">
-                        <span className="text-[10px] text-white/40 block">Distance</span>
-                        <strong className="text-white">{detour.detourDistanceKm} km</strong>
-                      </div>
-                      <div className="p-2 rounded-lg bg-black/30">
-                        <span className="text-[10px] text-white/40 block">Est. Time</span>
-                        <strong className="text-white">{detour.estimatedTravelTimeMinutes} min</strong>
-                      </div>
-                    </div>
+                    <p className="text-[12px] text-[#5F6368] leading-relaxed">{detour.overview}</p>
                   </div>
 
-                  <button
-                    onClick={() => setSelectedDetourForModal(detour)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30"
-                  >
-                    <span>Inspect Waypoints & Map</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="pt-2 border-t border-[#DADCE0] flex items-center justify-between">
+                    <span className="text-[11px] text-[#5F6368]">
+                      Est. ~{detour.estimatedTravelTimeMinutes} mins
+                    </span>
+                    <button
+                      onClick={() => setSelectedDetourForModal(detour)}
+                      className="px-3 py-1.5 rounded-[4px] bg-[#0B3D91] hover:bg-[#082E6E] text-[#FFFFFF] text-[12px] font-medium transition-colors flex items-center gap-1"
+                    >
+                      <span>Navigate Detour</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* TAB 3: EVACUATION PROTOCOLS */}
+        {/* TAB 3: EVACUATION GUIDELINES */}
         {activeTab === 'evacuation' && (
-          <div className="space-y-6">
-            {/* Hazard Selector Pills */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {[
-                { type: 'landslide' as DisasterType, label: 'Landslide & Rockfall' },
-                { type: 'flash_flood' as DisasterType, label: 'Teesta GLOF & Flash Flood' },
-                { type: 'earthquake' as DisasterType, label: 'Seismic Earthquake' },
-                { type: 'heavy_snowfall' as DisasterType, label: 'Blizzard & Snow Stranding' },
-              ].map((item) => (
-                <button
-                  key={item.type}
-                  onClick={() => setActiveGuidelineType(item.type)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex-shrink-0 ${
-                    activeGuidelineType === item.type
-                      ? 'bg-blue-600 text-white shadow-lg'
-                      : 'bg-slate-900 border border-white/10 text-white/70 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
+          <div className="space-y-4">
+            <div className="p-4 rounded-[8px] bg-[#FFFFFF] border border-[#DADCE0] shadow-xs space-y-4">
+              <div className="flex flex-wrap gap-2 text-[12px]">
+                {['landslide', 'flash_flood', 'heavy_snowfall', 'earthquake'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setActiveGuidelineType(type as DisasterType)}
+                    className={`px-3 py-1.5 rounded-full border transition-colors font-medium capitalize ${
+                      activeGuidelineType === type
+                        ? 'bg-[#0B3D91] text-[#FFFFFF] border-[#0B3D91]'
+                        : 'bg-[#FFFFFF] text-[#5F6368] border-[#DADCE0] hover:bg-[#F8F9FA]'
+                    }`}
+                  >
+                    {type.replace('_', ' ')} Guidelines
+                  </button>
+                ))}
+              </div>
 
-            {activeGuideline && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Steps & Guidance */}
-                <div className="lg:col-span-2 space-y-5">
-                  <div className="p-6 rounded-2xl bg-slate-900 border border-white/10 shadow-xl space-y-4">
-                    <h3 className="text-xl font-bold text-white">{activeGuideline.title}</h3>
-                    <p className="text-xs text-white/70 leading-relaxed">{activeGuideline.summary}</p>
+              {activeGuideline && (
+                <div className="space-y-3 pt-2 border-t border-[#DADCE0]">
+                  <h3 className="text-[16px] font-medium text-[#202124]">
+                    {activeGuideline.title}
+                  </h3>
+                  <p className="text-[13px] text-[#5F6368] leading-relaxed">
+                    {activeGuideline.summary}
+                  </p>
 
-                    <div className="p-4 rounded-xl bg-red-950/40 border border-red-500/30 space-y-2">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-red-300">
-                        Immediate Action Directives
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                    <div className="p-3.5 rounded-[4px] bg-[#F8F9FA] border border-[#DADCE0] space-y-2">
+                      <h4 className="text-[13px] font-medium text-[#137333]">
+                        Immediate Action Steps
                       </h4>
-                      <ul className="space-y-1.5 text-xs text-red-100 list-disc list-inside">
-                        {activeGuideline.immediateActions.map((action, idx) => (
-                          <li key={idx} className="leading-relaxed">
-                            {action}
-                          </li>
+                      <ul className="list-disc list-inside text-[12px] text-[#5F6368] space-y-1">
+                        {activeGuideline.immediateActions.map((act, i) => (
+                          <li key={i}>{act}</li>
                         ))}
                       </ul>
                     </div>
-                  </div>
 
-                  {/* Sequential Steps */}
-                  <div className="space-y-4">
-                    {activeGuideline.steps.map((step) => (
-                      <div
-                        key={step.stepNumber}
-                        className="p-5 rounded-2xl bg-slate-900 border border-white/10 shadow-xl space-y-3"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
-                            {step.stepNumber}
-                          </span>
-                          <h4 className="font-bold text-sm text-white">{step.actionTitle}</h4>
-                        </div>
-                        <p className="text-xs text-white/70 leading-relaxed pl-8">{step.details}</p>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-8 pt-2">
-                          <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20 text-xs">
-                            <strong className="text-emerald-300 block mb-1">Recommended Action:</strong>
-                            <ul className="space-y-1 text-emerald-100/80 list-disc list-inside text-[11px]">
-                              {step.doList.map((d, i) => (
-                                <li key={i}>{d}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/20 text-xs">
-                            <strong className="text-rose-300 block mb-1">Hazard Warning (Avoid):</strong>
-                            <ul className="space-y-1 text-rose-100/80 list-disc list-inside text-[11px]">
-                              {step.dontList.map((d, i) => (
-                                <li key={i}>{d}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Kit & Helplines Sidebar */}
-                <div className="space-y-5">
-                  {/* Emergency Kit Checklist */}
-                  <div className="p-5 rounded-2xl bg-slate-900 border border-white/10 shadow-xl space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                      <span>72-Hour Mountain Survival Kit</span>
-                    </h4>
-                    <ul className="space-y-2 text-xs text-white/80">
-                      {activeGuideline.emergencyKitList.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* 24x7 Helplines */}
-                  <div className="p-5 rounded-2xl bg-slate-900 border border-white/10 shadow-xl space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
-                      <span>24x7 Emergency Helplines</span>
-                    </h4>
-                    <div className="space-y-2.5">
-                      {activeGuideline.helplines.map((line) => (
-                        <div
-                          key={line.name}
-                          className="p-3 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between"
-                        >
-                          <div>
-                            <strong className="text-xs text-white block">{line.name}</strong>
-                            <span className="text-[10px] text-white/50">{line.hours}</span>
-                          </div>
-                          <a
-                            href={`tel:${line.phone}`}
-                            className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1 transition-colors"
-                          >
-                            <Phone className="w-3 h-3" />
-                            <span>Call</span>
-                          </a>
-                        </div>
-                      ))}
+                    <div className="p-3.5 rounded-[4px] bg-[#F8F9FA] border border-[#DADCE0] space-y-2">
+                      <h4 className="text-[13px] font-medium text-[#0B3D91]">
+                        Himalayan High Altitude Protocols
+                      </h4>
+                      <p className="text-[12px] text-[#5F6368] leading-relaxed">
+                        {activeGuideline.himalayanTerrainNotes}
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
-        {/* Tab 3: Safe Shelters & Evacuation Centers */}
+        {/* TAB 4: EMERGENCY SHELTERS */}
         {activeTab === 'shelters' && (
-          <div className="space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold text-white">Safe Relief Camps & Evacuation Centers</h3>
-                <p className="text-xs text-white/60">
-                  Designated high-ground relief centers equipped with power backups, food supplies, and trauma care
-                </p>
-              </div>
-
-              {/* District Filter */}
-              <select
-                value={selectedShelterDistrict}
-                onChange={(e) => setSelectedShelterDistrict(e.target.value as SikkimDistrict | 'all')}
-                className="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs text-white outline-none cursor-pointer"
-              >
-                <option value="all">All Sikkim Districts</option>
-                <option value="Gangtok">Gangtok District</option>
-                <option value="Mangan">Mangan (North Sikkim)</option>
-                <option value="Gyalshing">Gyalshing (West Sikkim)</option>
-                <option value="Namchi">Namchi (South Sikkim)</option>
-                <option value="Pakyong">Pakyong District</option>
-                <option value="Soreng">Soreng District</option>
-              </select>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
               {shelters.map((shelter) => (
                 <div
                   key={shelter.id}
-                  className="p-5 rounded-2xl bg-slate-900 border border-white/10 shadow-xl space-y-4 hover:border-purple-400 transition-all flex flex-col justify-between"
+                  className="p-4 rounded-[8px] bg-[#FFFFFF] border border-[#DADCE0] shadow-xs space-y-2.5 flex flex-col justify-between"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                        {shelter.district} District
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#E8F0FE] text-[#0B3D91] border border-[#D2E3FC]">
+                        Capacity: {shelter.capacityPersons} persons
                       </span>
-                      {shelter.distanceKm !== undefined && (
-                        <span className="text-xs font-bold text-emerald-400">
-                          {shelter.distanceKm} km away
-                        </span>
-                      )}
+                      <span className="text-[11px] text-[#5F6368]">
+                        {shelter.district}
+                      </span>
                     </div>
 
-                    <h4 className="text-base font-bold text-white leading-tight">{shelter.name}</h4>
-                    {shelter.localName && (
-                      <p className="text-xs text-white/50">{shelter.localName}</p>
-                    )}
+                    <h3 className="text-[14px] font-medium text-[#202124]">{shelter.name}</h3>
+                    <p className="text-[11px] text-[#5F6368]">{shelter.address}</p>
 
-                    <div className="space-y-1 text-xs text-white/70">
-                      <p className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
-                        <span>{shelter.address}</span>
-                      </p>
-                      <p className="text-[11px] text-white/50 pl-5">Altitude: {shelter.altitudeMeters} m</p>
-                    </div>
-
-                    {/* Capacity & Readiness Badges */}
-                    <div className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-2 text-xs">
-                      <div className="flex justify-between text-[11px]">
-                        <span className="text-white/60">Capacity:</span>
-                        <strong className="text-white">
-                          {shelter.currentOccupancy} / {shelter.capacityPersons} Persons
-                        </strong>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {shelter.hasMedicalPost && (
-                          <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold">
-                            Trauma Ward
-                          </span>
-                        )}
-                        {shelter.hasEmergencyPower && (
-                          <span className="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 font-semibold">
-                            Backup Power
-                          </span>
-                        )}
-                        {shelter.hasSatelliteComms && (
-                          <span className="px-2 py-0.5 rounded text-[10px] bg-blue-500/20 text-blue-300 font-semibold">
-                            Sat-Comms
-                          </span>
-                        )}
-                      </div>
+                    <div className="pt-1 text-[11px] text-[#5F6368]">
+                      <span className="font-medium text-[#202124]">Facilities: </span>
+                      <span>Medical: {shelter.hasMedicalPost ? 'Yes' : 'First-Aid'} • Satellite Comms: {shelter.hasSatelliteComms ? 'Active' : 'Radio'}</span>
                     </div>
                   </div>
 
-                  <a
-                    href={`tel:${shelter.contactPhone}`}
-                    className="w-full py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>Call Shelter ({shelter.contactPhone})</span>
-                  </a>
+                  <div className="pt-2 border-t border-[#DADCE0]">
+                    <a
+                      href={`tel:${shelter.contactPhone}`}
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-[4px] border border-[#DADCE0] bg-[#FFFFFF] py-1.5 text-[12px] font-medium text-[#0B3D91] hover:bg-[#F8F9FA] transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>Contact ({shelter.contactPhone})</span>
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
@@ -677,7 +501,9 @@ export default function DisasterCenterPage() {
 
         {/* TAB 5: ADMIN BROADCAST CONSOLE */}
         {activeTab === 'admin' && (
-          <AdminAlertManager alerts={alerts} onAlertsChanged={refreshAlerts} />
+          <div>
+            <AdminAlertManager />
+          </div>
         )}
       </main>
 
@@ -688,6 +514,7 @@ export default function DisasterCenterPage() {
           onClose={() => setSelectedDetourForModal(null)}
         />
       )}
+
     </div>
   );
 }
