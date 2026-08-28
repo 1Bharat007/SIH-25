@@ -240,7 +240,31 @@ export default function CultureHubPage() {
 
         {/* TAB 2: TRADITIONAL ATTIRE AR TRY-ON STUDIO */}
         {activeTab === 'attire_studio' && (
-          <div className="animate-fadeIn">
+          <div className="space-y-6 animate-fadeIn">
+            {/* Live MediaPipe Pose AR Studio Banner */}
+            <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-teal-950/60 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  New • MediaPipe Pose Estimation
+                </span>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-emerald-400" />
+                  <span>Real-Time Body-Tracking AR Studio (Single Garment Demo)</span>
+                </h3>
+                <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                  Experience real-time shoulder tracking and dynamic garment scaling at 30+ FPS directly through your webcam.
+                </p>
+              </div>
+
+              <Link
+                href="/culture/ar-demo"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 flex-shrink-0"
+              >
+                <Camera className="w-4 h-4 text-slate-950" />
+                <span>Launch Live AR Camera Demo</span>
+              </Link>
+            </div>
+
             {attireCatalog.length > 0 ? (
               <AttireTryOnStudio attireCatalog={attireCatalog} />
             ) : (
@@ -250,6 +274,7 @@ export default function CultureHubPage() {
             )}
           </div>
         )}
+
 
         {/* TAB 3: SACRED MONASTERIES & HERITAGE GUIDES */}
         {activeTab === 'monasteries' && (

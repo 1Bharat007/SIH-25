@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 850" width="600" height="850">
+  <defs>
+    <linearGradient id="brocadeGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b91c1c"/>
+      <stop offset="45%" stop-color="#991b1b"/>
+      <stop offset="100%" stop-color="#7f1d1d"/>
+    </linearGradient>
+    <linearGradient id="goldTrim" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <linearGradient id="silkSash" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="innerCollar" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#115e59"/>
+    </linearGradient>
+    <pattern id="lotusMotif" width="60" height="60" patternUnits="userSpaceOnUse">
+      <circle cx="30" cy="30" r="4" fill="#fbbf24" opacity="0.45"/>
+      <path d="M30 18 C25 24 25 32 30 38 C35 32 35 24 30 18 Z" fill="#fbbf24" opacity="0.4"/>
+      <path d="M18 30 C24 25 32 25 38 30 C32 35 24 35 18 30 Z" fill="#fbbf24" opacity="0.4"/>
+    </pattern>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <path d="M 120 180 L 20 280 L 70 330 L 170 240 Z" fill="#0d9488" stroke="#042f2e" stroke-width="2"/>
+    <path d="M 480 180 L 580 280 L 530 330 L 430 240 Z" fill="#0d9488" stroke="#042f2e" stroke-width="2"/>
+    <polygon points="20,280 70,330 85,315 35,265" fill="url(#goldTrim)"/>
+    <polygon points="580,280 530,330 515,315 565,265" fill="url(#goldTrim)"/>
+
+    <path d="M 230 120 C 170 125 140 145 130 160 L 145 380 L 110 520 L 90 790 C 90 820 120 830 200 830 L 400 830 C 480 830 510 820 510 790 L 490 520 L 455 380 L 470 160 C 460 145 430 125 370 120 Z" fill="url(#brocadeGlow)" stroke="#450a0a" stroke-width="3"/>
+    <path d="M 230 120 C 170 125 140 145 130 160 L 145 380 L 110 520 L 90 790 C 90 820 120 830 200 830 L 400 830 C 480 830 510 820 510 790 L 490 520 L 455 380 L 470 160 C 460 145 430 125 370 120 Z" fill="url(#lotusMotif)"/>
+
+    <path d="M 240 115 C 270 100 330 100 360 115 L 345 170 C 320 160 280 160 255 170 Z" fill="url(#innerCollar)" stroke="#134e4a" stroke-width="2"/>
+    <path d="M 255 160 Q 340 190 390 280 L 430 380 L 400 480 L 370 480 L 360 290 Q 310 210 245 165 Z" fill="#7f1d1d" stroke="url(#goldTrim)" stroke-width="4"/>
+    <path d="M 245 165 Q 315 210 365 295 L 405 385" fill="none" stroke="url(#goldTrim)" stroke-width="6" stroke-linecap="round"/>
+
+    <rect x="135" y="440" width="330" height="60" rx="12" fill="url(#silkSash)" stroke="#78350f" stroke-width="2.5"/>
+    <path d="M 140 455 L 460 455 M 140 475 L 460 475 M 140 485 L 460 485" stroke="#b45309" stroke-width="1.5" opacity="0.6"/>
+    
+    <circle cx="300" cy="470" r="22" fill="#78350f" stroke="url(#goldTrim)" stroke-width="4"/>
+    <circle cx="300" cy="470" r="12" fill="#0d9488" stroke="#fef08a" stroke-width="2"/>
+
+    <path d="M 285 490 L 275 620 L 305 615 L 300 490 Z" fill="url(#silkSash)" stroke="#78350f" stroke-width="1.5"/>
+    <path d="M 300 490 L 305 640 L 335 635 L 315 490 Z" fill="#d97706" stroke="#78350f" stroke-width="1.5"/>
+
+    <path d="M 200 500 L 180 825 M 260 500 L 250 828 M 340 500 L 350 828 M 400 500 L 420 825" stroke="#450a0a" stroke-width="2" opacity="0.5"/>
+    <path d="M 90 790 C 90 820 120 830 200 830 L 400 830 C 480 830 510 820 510 790 L 510 805 C 510 835 480 845 400 845 L 200 845 C 120 845 90 835 90 805 Z" fill="url(#goldTrim)"/>
+  </g>
+</svg>
